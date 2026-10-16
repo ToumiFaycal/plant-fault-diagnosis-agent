@@ -1,0 +1,19 @@
+# The project's ID card: what it is called and which libraries it needs.
+# `python -m pip install -e .` reads this file.
+
+[project]
+name = "plantagent"
+version = "0.1.0"
+description = "An AI agent that investigates alarms in a simulated chemical plant and explains its diagnosis with evidence."
+requires-python = ">=3.11"
+dependencies = [
+    "pandas==3.0.6",    # tables of data
+    "pyarrow==26.0.0",  # saves and loads tables as Parquet files
+    "pyreadr==0.5.7",   # reads R's .RData files (only for the one-time conversion)
+    "pytest==9.1.1",    # runs our automated tests
+]
+
+# The tool that turns this folder into an installable package.
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

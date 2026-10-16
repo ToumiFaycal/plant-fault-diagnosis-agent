@@ -1,0 +1,14 @@
+# Python's own files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environment (rebuilt from pyproject.toml)
+.venv/
+
+# Secrets
+.env
+
+# Plant data: large, downloaded and converted locally
+data/
