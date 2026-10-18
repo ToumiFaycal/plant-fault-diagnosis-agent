@@ -13,6 +13,10 @@ dependencies = [
     "pytest==9.1.1",    # runs our automated tests
 ]
 
+# Settings for pytest: where our tests live.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 # The tool that turns this folder into an installable package.
 [build-system]
 requires = ["setuptools>=61"]

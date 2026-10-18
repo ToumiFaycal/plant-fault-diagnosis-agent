@@ -5,6 +5,7 @@ The sources this project relies on, and what each one was used for.
 ## Setting up the project
 
 - [venv: creation of virtual environments](https://docs.python.org/3/library/venv.html) (Python documentation). What a virtual environment is, and the note on Windows that explains why PowerShell may refuse to run `Activate.ps1` and which setting allows it.
+- [tomllib: parse TOML files](https://docs.python.org/3/library/tomllib.html) (Python documentation). The built-in reader for our settings file, `config.toml`, and why the file must be opened in binary mode.
 
 ## The plant data
 

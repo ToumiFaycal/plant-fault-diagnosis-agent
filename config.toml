@@ -1,0 +1,18 @@
+# Project settings, in one place. Scripts read their numbers from here,
+# so every part of the project uses the same run numbers.
+
+[data]
+raw_dir = "data/raw"              # the four downloaded .RData files
+processed_dir = "data/processed"  # the Parquet files made by convert_data
+
+# Which recorded runs are used for what. Each range includes both ends.
+[splits]
+# Training runs (25 hours each)
+monitor_fit_runs = { first = 1, last = 100 }            # normal runs that teach the monitor what "normal" looks like
+monitor_calibration_runs = { first = 101, last = 150 }  # normal runs that set the monitor's alarm limits
+baseline_runs = { first = 1, last = 50 }                # runs of every fault (and normal) for the baseline classifier
+
+# Testing runs (48 hours each)
+dev_normal_runs = { first = 1, last = 10 }    # normal runs we develop and debug on
+dev_fault_runs = { first = 1, last = 5 }      # runs of each fault we develop and debug on
+test_pool_runs = { first = 201, last = 250 }  # kept apart for the final exam; how many we use is decided later
