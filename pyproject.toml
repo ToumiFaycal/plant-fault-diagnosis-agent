@@ -11,6 +11,7 @@ dependencies = [
     "pyarrow==26.0.0",  # saves and loads tables as Parquet files
     "pyreadr==0.5.7",   # reads R's .RData files (only for the one-time conversion)
     "pytest==9.1.1",    # runs our automated tests
+    "mcp==2.3.0",       # MCP: lets our tools live in a server that any AI app can connect to
 ]
 
 # Settings for pytest: where our tests live.
