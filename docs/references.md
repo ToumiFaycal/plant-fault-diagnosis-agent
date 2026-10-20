@@ -6,6 +6,7 @@ The sources this project relies on, and what each one was used for.
 
 - [venv: creation of virtual environments](https://docs.python.org/3/library/venv.html) (Python documentation). What a virtual environment is, and the note on Windows that explains why PowerShell may refuse to run `Activate.ps1` and which setting allows it.
 - [tomllib: parse TOML files](https://docs.python.org/3/library/tomllib.html) (Python documentation). The built-in reader for our settings file, `config.toml`, and why the file must be opened in binary mode.
+- [Building and testing Python](https://docs.github.com/en/actions/tutorials/build-and-test-code/python) (GitHub documentation). How a workflow file makes GitHub install the project and run its tests after every push; the basis of `.github/workflows/tests.yml`.
 
 ## The plant data
 
