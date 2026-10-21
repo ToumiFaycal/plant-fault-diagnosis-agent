@@ -40,3 +40,13 @@ The four data files were downloaded by hand from Dataverse. Their sizes and chec
 - `test/`: 21 files, 1,008,000 rows (50 runs × 960 samples each), 109 MB.
 
 So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the runs we use, and Parquet stores numbers compactly.
+
+## 2026-10-20: The language model's memory budget
+
+**What happened:** first check of the language model (Qwen3, 8 billion parameters, run by Ollama 0.40.5). Offered a toy "read a sensor" tool, it asked for the tool correctly in 3 tries out of 3 (temperature 0, seed 42, thinking mode off). The first call took 64 s, of which 36 s was loading the model into memory; the next calls took about 1 s each.
+
+**Memory:** the "context" is how much conversation the model can see at once, counted in tokens (pieces of words). Ollama's documentation gives its default as 4,096 tokens, and anything longer is cut off without warning, so we always set it ourselves. Measured on this laptop (8 GB graphics card):
+- 16,384 tokens (our starting value): 7.8 GB, split 20% on the main processor and 80% on the graphics card. The model doesn't fully fit on the card, and the part on the main processor runs slower.
+- 8,192 tokens: 6.2 GB, entirely on the graphics card.
+
+**Decision:** keep 16,384 for now. Once the agent exists, measure how long its conversations really get, then choose between room (16,384) and speed (8,192).

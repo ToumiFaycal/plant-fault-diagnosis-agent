@@ -16,3 +16,11 @@ baseline_runs = { first = 1, last = 50 }                # runs of every fault (a
 dev_normal_runs = { first = 1, last = 10 }    # normal runs we develop and debug on
 dev_fault_runs = { first = 1, last = 5 }      # runs of each fault we develop and debug on
 test_pool_runs = { first = 201, last = 250 }  # kept apart for the final exam; how many we use is decided later
+
+# The language model, run on this computer by Ollama.
+[llm]
+model = "qwen3:8b"
+num_ctx = 16384   # how much conversation (in tokens) the model can see at once; always set it ourselves
+temperature = 0   # 0 = always pick the most likely next word, so answers repeat from run to run
+seed = 42         # fixes the randomness that remains
+think = false     # Qwen3's slower "thinking mode"; whether it helps is measured later
