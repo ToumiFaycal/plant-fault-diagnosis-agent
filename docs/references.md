@@ -18,6 +18,11 @@ The sources this project relies on, and what each one was used for.
 - [Tool calling](https://docs.ollama.com/capabilities/tool-calling) (Ollama documentation). How a model is offered tools and how it replies with a request to run one; the basis of `src/plantagent/smoke_ollama.py`.
 - [FAQ: how can I specify the context window size?](https://docs.ollama.com/faq) (Ollama documentation). Ollama's default context is 4,096 tokens, which is why we always set `num_ctx` ourselves.
 
+## The plant itself
+
+- [Tennessee Eastman Challenge Archive](https://depts.washington.edu/control/LARRY/TE/download.html) (N. L. Ricker, University of Washington). Home of the plant's simulation code, including the 2015 revision by Bathelt, Ricker and Jelali, whose header lists every measurement and valve with its unit. Used to build and check `knowledge/tags.csv`.
+- [PCA for fault detection in Tennessee Eastman Process](https://bibmon.readthedocs.io/en/stable/tutorial_tep.html) (BibMon documentation). A clear table of the 41 measurements and 12 valves, with units and analyser timing, in the correct valve order. The second source for `tags.csv`.
+
 ## The plant data
 
 - [Additional Tennessee Eastman Process Simulation Data for Anomaly Detection Evaluation](https://doi.org/10.7910/DVN/6C3JR1) (Rieth, Amsel, Tran and Cook, 2017, Harvard Dataverse). The recorded plant runs this project works on: normal runs and runs with each of 20 faults. Used to download the four data files and to check the facts we rely on (one sample every 3 minutes, run lengths, when each fault starts).

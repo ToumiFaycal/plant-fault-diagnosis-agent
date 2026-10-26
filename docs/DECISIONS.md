@@ -50,3 +50,18 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 - 8,192 tokens: 6.2 GB, entirely on the graphics card.
 
 **Decision:** keep 16,384 for now. Once the agent exists, measure how long its conversations really get, then choose between room (16,384) and speed (8,192).
+
+## 2026-10-21: The list of signals, checked three ways
+
+**What:** the agent needs to know what each of the 52 signals measures, so we wrote `knowledge/tags.csv`. Facts about the plant must come from sources, not memory.
+
+**How it was checked:**
+- **The simulation's own code** (revised model by Bathelt, Ricker and Jelali, 2015) lists every measurement and valve with its unit.
+- **A published table** (BibMon documentation) gives the same names, units and order.
+- **The data:** the column names match `tags.csv` exactly, and the analyser timing shows up as expected (on a normal run, measurement 23 changes every 2nd sample, measurement 37 every 5th).
+
+**A trap found on the way:** the valves are numbered D, E, A feed (valves 1–3), while the measurements are numbered A, D, E feed (measurements 1–3). Some published tables list the valves in the A, D, E order, which would make the agent read the wrong valve. The code and BibMon agree on D, E, A.
+
+**Choices:**
+- Two extra columns beyond the plan, `new_value_every_min` and `delay_min`, because analyser values repeat between updates and arrive late. An agent that doesn't know this could read a flat line as "nothing changed".
+- Signals are grouped by plant part (feed, reactor, condenser, separator, compressor, stripper). Two stream groups, recycle and purge, are kept separate rather than attached to a unit, until the flow diagram is checked for the process overview.

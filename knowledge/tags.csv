@@ -1,0 +1,53 @@
+tag,description,engineering_unit,process_unit,new_value_every_min,delay_min
+xmeas_1,A feed flow (stream 1),kscmh,feed,3,0
+xmeas_2,D feed flow (stream 2),kg/h,feed,3,0
+xmeas_3,E feed flow (stream 3),kg/h,feed,3,0
+xmeas_4,A and C feed flow (stream 4),kscmh,feed,3,0
+xmeas_5,Recycle flow back to the reactor (stream 8),kscmh,recycle,3,0
+xmeas_6,Reactor feed flow (stream 6),kscmh,reactor,3,0
+xmeas_7,Reactor pressure,kPa gauge,reactor,3,0
+xmeas_8,Reactor liquid level,%,reactor,3,0
+xmeas_9,Reactor temperature,°C,reactor,3,0
+xmeas_10,Purge gas flow (stream 9),kscmh,purge,3,0
+xmeas_11,Separator temperature,°C,separator,3,0
+xmeas_12,Separator liquid level,%,separator,3,0
+xmeas_13,Separator pressure,kPa gauge,separator,3,0
+xmeas_14,Separator liquid outflow (stream 10),m3/h,separator,3,0
+xmeas_15,Stripper liquid level,%,stripper,3,0
+xmeas_16,Stripper pressure,kPa gauge,stripper,3,0
+xmeas_17,Stripper liquid outflow: the product (stream 11),m3/h,stripper,3,0
+xmeas_18,Stripper temperature,°C,stripper,3,0
+xmeas_19,Stripper steam flow,kg/h,stripper,3,0
+xmeas_20,Compressor work,kW,compressor,3,0
+xmeas_21,Reactor cooling water outlet temperature,°C,reactor,3,0
+xmeas_22,Condenser cooling water outlet temperature (some tables call it the separator cooling water),°C,condenser,3,0
+xmeas_23,Share of component A in the reactor feed (stream 6),mol %,reactor,6,6
+xmeas_24,Share of component B in the reactor feed (stream 6),mol %,reactor,6,6
+xmeas_25,Share of component C in the reactor feed (stream 6),mol %,reactor,6,6
+xmeas_26,Share of component D in the reactor feed (stream 6),mol %,reactor,6,6
+xmeas_27,Share of component E in the reactor feed (stream 6),mol %,reactor,6,6
+xmeas_28,Share of component F in the reactor feed (stream 6),mol %,reactor,6,6
+xmeas_29,Share of component A in the purge gas (stream 9),mol %,purge,6,6
+xmeas_30,Share of component B in the purge gas (stream 9),mol %,purge,6,6
+xmeas_31,Share of component C in the purge gas (stream 9),mol %,purge,6,6
+xmeas_32,Share of component D in the purge gas (stream 9),mol %,purge,6,6
+xmeas_33,Share of component E in the purge gas (stream 9),mol %,purge,6,6
+xmeas_34,Share of component F in the purge gas (stream 9),mol %,purge,6,6
+xmeas_35,Share of component G in the purge gas (stream 9),mol %,purge,6,6
+xmeas_36,Share of component H in the purge gas (stream 9),mol %,purge,6,6
+xmeas_37,Share of component D in the product (stream 11),mol %,stripper,15,15
+xmeas_38,Share of component E in the product (stream 11),mol %,stripper,15,15
+xmeas_39,Share of component F in the product (stream 11),mol %,stripper,15,15
+xmeas_40,Share of component G in the product (stream 11),mol %,stripper,15,15
+xmeas_41,Share of component H in the product (stream 11),mol %,stripper,15,15
+xmv_1,D feed flow valve (stream 2),%,feed,3,0
+xmv_2,E feed flow valve (stream 3),%,feed,3,0
+xmv_3,A feed flow valve (stream 1),%,feed,3,0
+xmv_4,A and C feed flow valve (stream 4),%,feed,3,0
+xmv_5,Compressor recycle valve,%,compressor,3,0
+xmv_6,Purge valve (stream 9),%,purge,3,0
+xmv_7,Separator liquid outflow valve (stream 10),%,separator,3,0
+xmv_8,Stripper product outflow valve (stream 11),%,stripper,3,0
+xmv_9,Stripper steam valve,%,stripper,3,0
+xmv_10,Reactor cooling water flow valve,%,reactor,3,0
+xmv_11,Condenser cooling water flow valve,%,condenser,3,0
