@@ -64,13 +64,11 @@ def main() -> None:
     print(f"Answered in {time.perf_counter() - start:.1f} s")
     show_reply(response.message)
     tool_calls = response.message.tool_calls
-    if tool_calls is None or len(tool_calls) == 0:
+    if not check(tool_calls is not None and len(tool_calls) > 0, "model asked for at least one tool"):
         print("No tool was asked for, so the other checks can't be done.")
         return
-    check(tool_calls is not None and len(tool_calls) > 0, "model asked for at least one tool")
     check(tool_calls[0].function.name == "read_sensor", "first tool is read_sensor")
     check(tool_calls[0].function.arguments["tag"] == "TI-101", "asks for sensor TI-101")
-
 
 
 if __name__ == "__main__":
