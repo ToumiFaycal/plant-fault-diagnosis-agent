@@ -21,7 +21,8 @@ The sources this project relies on, and what each one was used for.
 ## The plant itself
 
 - [Tennessee Eastman Challenge Archive](https://depts.washington.edu/control/LARRY/TE/download.html) (N. L. Ricker, University of Washington). Home of the plant's simulation code, including the 2015 revision by Bathelt, Ricker and Jelali, whose header lists every measurement and valve with its unit. Used to build and check `knowledge/tags.csv`.
-- [PCA for fault detection in Tennessee Eastman Process](https://bibmon.readthedocs.io/en/stable/tutorial_tep.html) (BibMon documentation). A clear table of the 41 measurements and 12 valves, with units and analyser timing, in the correct valve order. The second source for `tags.csv`.
+- [PCA for fault detection in Tennessee Eastman Process](https://bibmon.readthedocs.io/en/stable/tutorial_tep.html) (BibMon documentation). A clear table of the 41 measurements and 12 valves, with units and analyser timing, in the correct valve order, and a short description of the plant's units. A source for `tags.csv` and `process_overview.md`.
+- [FaultExplainer: Leveraging Large Language Models for Interpretable Fault Detection and Diagnosis](https://arxiv.org/abs/2412.14492) (Khan, Nahar, Chen, Constante Flores and Li, 2024) and its [code](https://github.com/li-group/FaultExplainer). The published work closest to this project: a language model explains faults of the same plant from a single prompt. Its prompt file (`backend/prompts.py`) holds a detailed description of the plant, used as a source for `process_overview.md`.
 
 ## The plant data
 

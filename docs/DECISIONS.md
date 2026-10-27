@@ -65,3 +65,15 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 **Choices:**
 - Two extra columns beyond the plan, `new_value_every_min` and `delay_min`, because analyser values repeat between updates and arrive late. An agent that doesn't know this could read a flat line as "nothing changed".
 - Signals are grouped by plant part (feed, reactor, condenser, separator, compressor, stripper). Two stream groups, recycle and purge, are kept separate rather than attached to a unit, until the flow diagram is checked for the process overview.
+
+## 2026-10-26: How the plant is laid out, and a typo in the code's comments
+
+**What:** wrote `knowledge/process_overview.md`: what the plant makes, its four reactions, its five units and how material flows between them. Sources: the BibMon documentation (units and flows) and the process description in the FaultExplainer project (reactions, where feed stream 4 goes), with the simulation code used to settle details.
+
+**The surprise:** the code's own documentation says the second reaction makes F ("A + C + E → F"), while the published description says it makes H. The calculation itself decides: in the code, the amount of H created comes from the second reaction's rate. So the comment has a typo, and the published description is right. Lesson: when a comment and the code disagree, believe the code, because the code is what actually runs.
+
+**Also confirmed in the code:** feed stream 4 is the gas used for stripping in the stripper; the reaction making G depends on temperature more strongly than the one making H, and the by-product reaction A + E → F most strongly of all.
+
+**Checked on a normal run:** the purge carries about one hundredth of the recycle flow (0.34 against 26.9 kscmh), and F also appears in small amounts in the product, so the overview calls the purge the "main" way out for B and F rather than the only one.
+
+**Choice:** recycle and purge stay as their own groups in `tags.csv`; the overview explains where they connect (both carry gas from the separator).
