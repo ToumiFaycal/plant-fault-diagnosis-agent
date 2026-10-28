@@ -3,11 +3,13 @@
 import re
 
 import pandas as pd
+import pytest
 
 from plantagent.config import PROJECT_ROOT
 
 KNOWLEDGE_DIR = PROJECT_ROOT / "knowledge"
 TAGS_CSV = KNOWLEDGE_DIR / "tags.csv"
+FAULT_CATALOGUE = KNOWLEDGE_DIR / "fault_catalogue.md"
 
 
 def test_every_cell_of_tags_csv_is_filled_in():
@@ -33,3 +35,16 @@ def test_every_signal_named_in_the_documents_exists():
         named = set(re.findall(r"\b(?:xmeas|xmv)_\d+\b", text))  # every "xmeas_<number>" or "xmv_<number>"
         unknown = named - known_tags  # named in the document but missing from tags.csv
         assert unknown == set(), f"{document.name} names signals that don't exist: {sorted(unknown)}"
+
+
+def test_fault_catalogue_has_one_section_per_described_fault():
+    text = FAULT_CATALOGUE.read_text(encoding="utf-8")
+    for fault in range(1, 16):
+        assert f"## Fault {fault}:" in text, f"no section for fault {fault}"
+    assert "## Faults 16 to 20" in text
+
+
+def test_fault_catalogue_names_no_signals():
+    catalogue_text = FAULT_CATALOGUE.read_text(encoding="utf-8")
+    assert "xmeas_" not in catalogue_text
+    assert "xmv_" not in catalogue_text

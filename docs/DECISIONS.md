@@ -77,3 +77,13 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 **Checked on a normal run:** the purge carries about one hundredth of the recycle flow (0.34 against 26.9 kscmh), and F also appears in small amounts in the product, so the overview calls the purge the "main" way out for B and F rather than the only one.
 
 **Choice:** recycle and purge stay as their own groups in `tags.csv`; the overview explains where they connect (both carry gas from the separator).
+
+## 2026-10-27: What the fault catalogue may and may not say
+
+**What:** wrote `knowledge/fault_catalogue.md`: for each fault, what changes, where in the plant, and what kind of change it is (step, random variation, slow drift, sticking). Three sources agree word for word on faults 1 to 15: the disturbance table in the simulation code, the BibMon documentation and the fault list in FaultExplainer's code.
+
+**Choices, and why:**
+- **Causes only, never symptoms.** The catalogue says what goes wrong, not how it shows up in the measurements. Notes like "if this signal rises, it's fault 4" would come from looking at the fault data, which is the answer key, so the evaluation would measure our notes instead of the agent. A test checks that no signal name appears in the catalogue.
+- **Faults 16 to 20 stay "unknown".** The revised simulation code describes what its own versions of these faults do, but the original problem deliberately leaves them undescribed, and our grading expects the agent to report "a fault that is not in the catalogue" for them. Telling the agent would change the problem being solved.
+- **No difficulty or grading information.** The literature reports faults 3, 9 and 15 as nearly impossible to detect, but the catalogue doesn't say so: the agent should decide from the data, not from what we know about the grading.
+- **Fault 13** is described as a slow drift in how fast the reactions run, and the code shows which ones: the two that make the products G and H. That describes the cause, taken from the model itself.
