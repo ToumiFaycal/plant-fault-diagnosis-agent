@@ -4,6 +4,7 @@ import numpy as np
 
 from plantagent.config import load_config
 from plantagent.convert_data import runs_between
+from plantagent.monitor.patterns import choose_number_of_patterns, fit_patterns
 from plantagent.monitor.standardize import fit_normal_stats, standardize
 
 
@@ -45,3 +46,18 @@ def test_monitor_fitting_and_calibration_runs_never_overlap():
     fitting = runs_between(splits["monitor_fit_runs"])
     calibration = runs_between(splits["monitor_calibration_runs"])
     assert fitting & calibration == set()
+
+
+def test_two_signals_that_move_together_make_one_main_pattern():
+    random = np.random.default_rng(0)  # made-up random numbers, the same every time the test runs
+    pressure = random.normal(size=200)
+    other_pressure = pressure + 0.01 * random.normal(size=200)  # follows the first one very closely
+    shares = fit_patterns(np.column_stack([pressure, other_pressure])).explained_variance_ratio_
+    assert shares[0] > 0.99  # one pattern ("both together") explains almost everything
+
+
+def test_number_of_patterns_kept():
+    shares = np.array([0.60, 0.25, 0.10, 0.05])
+    assert choose_number_of_patterns(shares, 0.50) == 1  # 0.60 already reaches 50 %
+    assert choose_number_of_patterns(shares, 0.90) == 3  # 0.60 + 0.25 = 0.85 isn't enough; + 0.10 = 0.95 is
+    assert choose_number_of_patterns(shares, 0.99) == 4  # all four are needed

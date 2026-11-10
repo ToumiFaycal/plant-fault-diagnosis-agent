@@ -10,6 +10,7 @@ dependencies = [
     "pandas==3.0.6",    # tables of data
     "numpy==2.5.4",     # fast maths on tables of numbers (the monitor)
     "matplotlib==3.11.2",  # draws charts of the results
+    "scikit-learn==1.9.1",  # finds the normal patterns (PCA), later the baseline classifier
     "pyarrow==26.0.0",  # saves and loads tables as Parquet files
     "pyreadr==0.5.7",   # reads R's .RData files (only for the one-time conversion)
     "pytest==9.1.1",    # runs our automated tests

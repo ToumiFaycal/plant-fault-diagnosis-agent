@@ -17,6 +17,10 @@ dev_normal_runs = { first = 1, last = 10 }    # normal runs we develop and debug
 dev_fault_runs = { first = 1, last = 5 }      # runs of each fault we develop and debug on
 test_pool_runs = { first = 201, last = 250 }  # kept apart for the final exam; how many we use is decided later
 
+# The monitor (the plant's smoke detector).
+[monitor]
+share_of_variation_to_keep = 0.90  # keep enough normal patterns to explain 90 % of normal variation
+
 # The language model, run on this computer by Ollama.
 [llm]
 model = "qwen3:8b"

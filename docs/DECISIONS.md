@@ -100,3 +100,13 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 **Why it matters:**
 - Runs with the same number share their random seed across faults. So the part of a fault run before the fault starts is normal operation. The baseline classifier must not label those samples as the fault.
 - Episodes and the evaluation must use sample 161 (testing) and 21 (training) as the first faulty sample.
+
+## 2026-11-10: How many normal patterns the monitor keeps
+
+**What:** the monitor's second stage finds the patterns of a healthy plant (PCA) in the normal fitting runs (50,000 moments × 52 signals, after putting every signal on the same scale), and keeps enough of them to explain a set share of the normal variation.
+
+**Measured:** the first five patterns explain 15.9 %, 9.3 %, 5.0 %, 3.9 % and 3.9 % of the normal variation. Patterns needed: 9 for 50 %, 22 for 75 %, **31 for 90 %**, 36 for 95 %.
+
+**Choice:** 90 %, the starting value in the plan, so **31 patterns out of 52**. It's set in `config.toml` and may be revisited once the monitor's false alarms and detection are measured.
+
+**The surprise:** a handful of patterns is not enough for this plant. Only 42 of the 1,326 pairs of signals are strongly linked in normal operation (correlation above 0.5 either way), and much of each sensor's normal wobble is its own random noise, shared with nothing else. The strongest links are what you'd expect physically, like reactor and separator pressure (+0.998) or a valve and the flow it sets.
