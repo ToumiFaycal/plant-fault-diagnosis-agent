@@ -87,3 +87,16 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 - **Faults 16 to 20 stay "unknown".** The revised simulation code describes what its own versions of these faults do, but the original problem deliberately leaves them undescribed, and our grading expects the agent to report "a fault that is not in the catalogue" for them. Telling the agent would change the problem being solved.
 - **No difficulty or grading information.** The literature reports faults 3, 9 and 15 as nearly impossible to detect, but the catalogue doesn't say so: the agent should decide from the data, not from what we know about the grading.
 - **Fault 13** is described as a slow drift in how fast the reactions run, and the code shows which ones: the two that make the products G and H. That describes the cause, taken from the model itself.
+
+## 2026-11-10: When exactly a fault starts, and runs that share their randomness
+
+**What happened:** while checking the monitor's first stage on development runs, a fault run and the normal run with the same number turned out to be identical, sample for sample, until the fault started.
+
+**Measured:**
+- In the testing runs, fault runs 1 (faults 1, 4 and 6) are identical to normal run 1 up to sample 160 (8:00), and first differ at **sample 161** (8:03). Fault 13, a slow drift, first shows a difference at sample 165.
+- In the training runs, fault 4's run 1 first differs from normal run 1 at **sample 21** (1:03).
+- This settles a question left open since the start: the dataset's "after 1 hour" and "after 8 hours" mean the first affected sample is 21 (training) and 161 (testing).
+
+**Why it matters:**
+- Runs with the same number share their random seed across faults. So the part of a fault run before the fault starts is normal operation. The baseline classifier must not label those samples as the fault.
+- Episodes and the evaluation must use sample 161 (testing) and 21 (training) as the first faulty sample.
