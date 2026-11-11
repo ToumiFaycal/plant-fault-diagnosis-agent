@@ -165,7 +165,7 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 
 **What:** a random forest (scikit-learn, 100 trees) learns to name the fault from labelled examples, with no tools and no reasoning. It looks at one hour of the plant, summed up per signal by its average, its wobble (standard deviation) and its slope: 156 numbers. It learns from training runs 1–50 of the normal plant and of each of the 20 faults (21 answers, 0 to 20), one 1-hour window every 30 minutes: 49,450 windows, about one minute of training. In fault runs, only windows that start at or after the fault's first sample (21) are used, since the hour before is healthy. On each development episode it sees only the last hour before "now". The model is not saved: it is trained again each time from fixed settings and seed (`[baseline]` in `config.toml`).
 
-**Measured in a rehearsal** (same code and seed; the official numbers are those the script writes to `results/RESULTS.md`):
+**Measured** (first in a rehearsal, then in the official run from commit `bced844`, which gave exactly the same numbers; see `results/RESULTS.md`):
 - Known faults named exactly: **60 of 60**. Unknown-type faults (16–20): **25 of 25**, each named exactly, because it has seen 50 labelled runs of each.
 - Normal runs called "no fault": only **1 of 10**. Hard faults acceptable: 8 of 15.
 

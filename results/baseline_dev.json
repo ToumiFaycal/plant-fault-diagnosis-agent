@@ -1,0 +1,1971 @@
+{
+  "date": "2026-11-11",
+  "commit": "bced844",
+  "settings": {
+    "window_minutes": 60,
+    "window_every_minutes": 30,
+    "trees": 100,
+    "min_examples_per_leaf": 5,
+    "seed": 0
+  },
+  "training_windows": 49450,
+  "training_seconds": 36,
+  "groups": {
+    "normal": {
+      "episodes": 10,
+      "right": 1,
+      "true_fault_in_top3": 7,
+      "median_probability": 0.28500000000000003
+    },
+    "known": {
+      "episodes": 60,
+      "right": 60,
+      "true_fault_in_top3": 60,
+      "median_probability": 0.855
+    },
+    "hard": {
+      "episodes": 15,
+      "right": 8,
+      "true_fault_in_top3": 11,
+      "median_probability": 0.26
+    },
+    "unknown-type": {
+      "episodes": 25,
+      "right": 25,
+      "true_fault_in_top3": 25,
+      "median_probability": 0.97
+    }
+  },
+  "faults": {
+    "0": {
+      "group": "normal",
+      "episodes": 10,
+      "right": 1,
+      "answers": [
+        0,
+        3,
+        3,
+        9,
+        9,
+        10,
+        10,
+        15,
+        15,
+        15
+      ],
+      "median_probability": 0.28500000000000003
+    },
+    "1": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "median_probability": 0.53
+    },
+    "2": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "median_probability": 0.95
+    },
+    "3": {
+      "group": "hard",
+      "episodes": 5,
+      "right": 4,
+      "answers": [
+        0,
+        0,
+        3,
+        3,
+        15
+      ],
+      "median_probability": 0.24
+    },
+    "4": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "median_probability": 0.93
+    },
+    "5": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "median_probability": 0.78
+    },
+    "6": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "median_probability": 0.85
+    },
+    "7": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "median_probability": 0.75
+    },
+    "8": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "median_probability": 0.74
+    },
+    "9": {
+      "group": "hard",
+      "episodes": 5,
+      "right": 1,
+      "answers": [
+        0,
+        3,
+        10,
+        15,
+        16
+      ],
+      "median_probability": 0.26
+    },
+    "10": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "median_probability": 0.81
+    },
+    "11": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        11,
+        11,
+        11,
+        11,
+        11
+      ],
+      "median_probability": 0.98
+    },
+    "12": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        12,
+        12,
+        12,
+        12,
+        12
+      ],
+      "median_probability": 0.97
+    },
+    "13": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        13,
+        13,
+        13,
+        13,
+        13
+      ],
+      "median_probability": 0.48
+    },
+    "14": {
+      "group": "known",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        14,
+        14,
+        14,
+        14,
+        14
+      ],
+      "median_probability": 0.98
+    },
+    "15": {
+      "group": "hard",
+      "episodes": 5,
+      "right": 3,
+      "answers": [
+        0,
+        9,
+        10,
+        15,
+        15
+      ],
+      "median_probability": 0.28
+    },
+    "16": {
+      "group": "unknown-type",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "median_probability": 0.91
+    },
+    "17": {
+      "group": "unknown-type",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        17,
+        17,
+        17,
+        17,
+        17
+      ],
+      "median_probability": 0.99
+    },
+    "18": {
+      "group": "unknown-type",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        18,
+        18,
+        18,
+        18,
+        18
+      ],
+      "median_probability": 0.81
+    },
+    "19": {
+      "group": "unknown-type",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        19,
+        19,
+        19,
+        19,
+        19
+      ],
+      "median_probability": 0.99
+    },
+    "20": {
+      "group": "unknown-type",
+      "episodes": 5,
+      "right": 5,
+      "answers": [
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "median_probability": 0.97
+    }
+  },
+  "episodes": [
+    {
+      "episode": "ep_f6f8d79c",
+      "fault": 5,
+      "group": "known",
+      "top3": [
+        5,
+        13,
+        8
+      ],
+      "top3_probability": [
+        0.56,
+        0.12,
+        0.08
+      ]
+    },
+    {
+      "episode": "ep_252a1ab8",
+      "fault": 19,
+      "group": "unknown-type",
+      "top3": [
+        19,
+        20,
+        18
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_d48e7f73",
+      "fault": 3,
+      "group": "hard",
+      "top3": [
+        0,
+        15,
+        9
+      ],
+      "top3_probability": [
+        0.24,
+        0.22,
+        0.2
+      ]
+    },
+    {
+      "episode": "ep_c483fbd7",
+      "fault": 18,
+      "group": "unknown-type",
+      "top3": [
+        18,
+        10,
+        12
+      ],
+      "top3_probability": [
+        0.86,
+        0.04,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_73679aed",
+      "fault": 9,
+      "group": "hard",
+      "top3": [
+        15,
+        9,
+        3
+      ],
+      "top3_probability": [
+        0.26,
+        0.24,
+        0.22
+      ]
+    },
+    {
+      "episode": "ep_a06be66d",
+      "fault": 8,
+      "group": "known",
+      "top3": [
+        8,
+        1,
+        13
+      ],
+      "top3_probability": [
+        0.65,
+        0.13,
+        0.05
+      ]
+    },
+    {
+      "episode": "ep_614862e1",
+      "fault": 13,
+      "group": "known",
+      "top3": [
+        13,
+        9,
+        15
+      ],
+      "top3_probability": [
+        0.48,
+        0.09,
+        0.09
+      ]
+    },
+    {
+      "episode": "ep_45346ffa",
+      "fault": 14,
+      "group": "known",
+      "top3": [
+        14,
+        17,
+        11
+      ],
+      "top3_probability": [
+        0.97,
+        0.02,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_c97c109d",
+      "fault": 18,
+      "group": "unknown-type",
+      "top3": [
+        18,
+        5,
+        12
+      ],
+      "top3_probability": [
+        0.81,
+        0.07,
+        0.05
+      ]
+    },
+    {
+      "episode": "ep_1a23e905",
+      "fault": 15,
+      "group": "hard",
+      "top3": [
+        15,
+        9,
+        0
+      ],
+      "top3_probability": [
+        0.36,
+        0.2,
+        0.15
+      ]
+    },
+    {
+      "episode": "ep_2cb6a5dc",
+      "fault": 11,
+      "group": "known",
+      "top3": [
+        11,
+        14,
+        10
+      ],
+      "top3_probability": [
+        0.98,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_75cb5e1b",
+      "fault": 2,
+      "group": "known",
+      "top3": [
+        2,
+        8,
+        10
+      ],
+      "top3_probability": [
+        0.91,
+        0.04,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_688ab827",
+      "fault": 7,
+      "group": "known",
+      "top3": [
+        7,
+        12,
+        8
+      ],
+      "top3_probability": [
+        0.66,
+        0.14,
+        0.09
+      ]
+    },
+    {
+      "episode": "ep_a4b9361a",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        9,
+        3,
+        0
+      ],
+      "top3_probability": [
+        0.24,
+        0.21,
+        0.18
+      ]
+    },
+    {
+      "episode": "ep_f0024163",
+      "fault": 10,
+      "group": "known",
+      "top3": [
+        10,
+        16,
+        9
+      ],
+      "top3_probability": [
+        0.8,
+        0.13,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_cb768f9e",
+      "fault": 6,
+      "group": "known",
+      "top3": [
+        6,
+        8,
+        13
+      ],
+      "top3_probability": [
+        0.9,
+        0.07,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_b8a12017",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        10,
+        16,
+        7
+      ],
+      "top3_probability": [
+        0.33,
+        0.18,
+        0.11
+      ]
+    },
+    {
+      "episode": "ep_bca99fa2",
+      "fault": 12,
+      "group": "known",
+      "top3": [
+        12,
+        10,
+        18
+      ],
+      "top3_probability": [
+        0.98,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_2a4bc758",
+      "fault": 4,
+      "group": "known",
+      "top3": [
+        4,
+        0,
+        15
+      ],
+      "top3_probability": [
+        0.93,
+        0.02,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_1b10bf38",
+      "fault": 7,
+      "group": "known",
+      "top3": [
+        7,
+        12,
+        8
+      ],
+      "top3_probability": [
+        0.75,
+        0.09,
+        0.07
+      ]
+    },
+    {
+      "episode": "ep_df9412a9",
+      "fault": 11,
+      "group": "known",
+      "top3": [
+        11,
+        0,
+        4
+      ],
+      "top3_probability": [
+        0.99,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_7967c47b",
+      "fault": 19,
+      "group": "unknown-type",
+      "top3": [
+        19,
+        20,
+        18
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_13da69fa",
+      "fault": 18,
+      "group": "unknown-type",
+      "top3": [
+        18,
+        10,
+        12
+      ],
+      "top3_probability": [
+        0.8,
+        0.05,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_b4555b5c",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        9,
+        0,
+        15
+      ],
+      "top3_probability": [
+        0.26,
+        0.21,
+        0.2
+      ]
+    },
+    {
+      "episode": "ep_db146a3f",
+      "fault": 9,
+      "group": "hard",
+      "top3": [
+        10,
+        9,
+        0
+      ],
+      "top3_probability": [
+        0.22,
+        0.19,
+        0.16
+      ]
+    },
+    {
+      "episode": "ep_be74d696",
+      "fault": 9,
+      "group": "hard",
+      "top3": [
+        16,
+        10,
+        3
+      ],
+      "top3_probability": [
+        0.25,
+        0.25,
+        0.13
+      ]
+    },
+    {
+      "episode": "ep_9855b078",
+      "fault": 6,
+      "group": "known",
+      "top3": [
+        6,
+        8,
+        20
+      ],
+      "top3_probability": [
+        0.82,
+        0.11,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_160d1e9c",
+      "fault": 15,
+      "group": "hard",
+      "top3": [
+        10,
+        16,
+        15
+      ],
+      "top3_probability": [
+        0.29,
+        0.21,
+        0.15
+      ]
+    },
+    {
+      "episode": "ep_8e5e5401",
+      "fault": 16,
+      "group": "unknown-type",
+      "top3": [
+        16,
+        10,
+        13
+      ],
+      "top3_probability": [
+        0.82,
+        0.1,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_eef1c91b",
+      "fault": 16,
+      "group": "unknown-type",
+      "top3": [
+        16,
+        10,
+        9
+      ],
+      "top3_probability": [
+        0.91,
+        0.04,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_41970343",
+      "fault": 12,
+      "group": "known",
+      "top3": [
+        12,
+        18,
+        8
+      ],
+      "top3_probability": [
+        0.99,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_4db726ba",
+      "fault": 11,
+      "group": "known",
+      "top3": [
+        11,
+        17,
+        4
+      ],
+      "top3_probability": [
+        0.97,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_da12f9aa",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        15,
+        0,
+        9
+      ],
+      "top3_probability": [
+        0.28,
+        0.21,
+        0.2
+      ]
+    },
+    {
+      "episode": "ep_5399d9e9",
+      "fault": 4,
+      "group": "known",
+      "top3": [
+        4,
+        11,
+        15
+      ],
+      "top3_probability": [
+        0.95,
+        0.02,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_5d8ff1ea",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        0,
+        3,
+        9
+      ],
+      "top3_probability": [
+        0.29,
+        0.25,
+        0.2
+      ]
+    },
+    {
+      "episode": "ep_25689797",
+      "fault": 2,
+      "group": "known",
+      "top3": [
+        2,
+        8,
+        10
+      ],
+      "top3_probability": [
+        0.96,
+        0.03,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_48cd8b52",
+      "fault": 20,
+      "group": "unknown-type",
+      "top3": [
+        20,
+        0,
+        3
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_7690bcbb",
+      "fault": 6,
+      "group": "known",
+      "top3": [
+        6,
+        8,
+        1
+      ],
+      "top3_probability": [
+        0.81,
+        0.12,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_a9ccb806",
+      "fault": 4,
+      "group": "known",
+      "top3": [
+        4,
+        3,
+        0
+      ],
+      "top3_probability": [
+        0.95,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_7906e62b",
+      "fault": 8,
+      "group": "known",
+      "top3": [
+        8,
+        1,
+        13
+      ],
+      "top3_probability": [
+        0.74,
+        0.12,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_cc0fc57b",
+      "fault": 10,
+      "group": "known",
+      "top3": [
+        10,
+        16,
+        9
+      ],
+      "top3_probability": [
+        0.82,
+        0.11,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_06c34cbf",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        15,
+        9,
+        0
+      ],
+      "top3_probability": [
+        0.27,
+        0.2,
+        0.19
+      ]
+    },
+    {
+      "episode": "ep_f1e3a092",
+      "fault": 20,
+      "group": "unknown-type",
+      "top3": [
+        20,
+        8,
+        16
+      ],
+      "top3_probability": [
+        0.94,
+        0.02,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_875a1c87",
+      "fault": 5,
+      "group": "known",
+      "top3": [
+        5,
+        13,
+        8
+      ],
+      "top3_probability": [
+        0.78,
+        0.09,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_dbc3b34f",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        3,
+        15,
+        9
+      ],
+      "top3_probability": [
+        0.34,
+        0.16,
+        0.16
+      ]
+    },
+    {
+      "episode": "ep_19351d0d",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        15,
+        3,
+        0
+      ],
+      "top3_probability": [
+        0.29,
+        0.21,
+        0.18
+      ]
+    },
+    {
+      "episode": "ep_6b60f5e9",
+      "fault": 6,
+      "group": "known",
+      "top3": [
+        6,
+        8,
+        1
+      ],
+      "top3_probability": [
+        0.85,
+        0.09,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_5c30879b",
+      "fault": 15,
+      "group": "hard",
+      "top3": [
+        0,
+        9,
+        15
+      ],
+      "top3_probability": [
+        0.28,
+        0.23,
+        0.18
+      ]
+    },
+    {
+      "episode": "ep_5a5609cb",
+      "fault": 12,
+      "group": "known",
+      "top3": [
+        12,
+        13,
+        17
+      ],
+      "top3_probability": [
+        0.97,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_08deb6fc",
+      "fault": 9,
+      "group": "hard",
+      "top3": [
+        0,
+        9,
+        15
+      ],
+      "top3_probability": [
+        0.28,
+        0.24,
+        0.2
+      ]
+    },
+    {
+      "episode": "ep_719e0f3d",
+      "fault": 12,
+      "group": "known",
+      "top3": [
+        12,
+        13,
+        8
+      ],
+      "top3_probability": [
+        0.94,
+        0.02,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_855049a8",
+      "fault": 13,
+      "group": "known",
+      "top3": [
+        13,
+        0,
+        9
+      ],
+      "top3_probability": [
+        0.25,
+        0.13,
+        0.12
+      ]
+    },
+    {
+      "episode": "ep_773fde41",
+      "fault": 3,
+      "group": "hard",
+      "top3": [
+        0,
+        9,
+        15
+      ],
+      "top3_probability": [
+        0.22,
+        0.21,
+        0.2
+      ]
+    },
+    {
+      "episode": "ep_27aff8ea",
+      "fault": 8,
+      "group": "known",
+      "top3": [
+        8,
+        13,
+        5
+      ],
+      "top3_probability": [
+        0.89,
+        0.04,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_b3757798",
+      "fault": 12,
+      "group": "known",
+      "top3": [
+        12,
+        13,
+        10
+      ],
+      "top3_probability": [
+        0.9,
+        0.04,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_4552331a",
+      "fault": 3,
+      "group": "hard",
+      "top3": [
+        15,
+        3,
+        9
+      ],
+      "top3_probability": [
+        0.22,
+        0.2,
+        0.16
+      ]
+    },
+    {
+      "episode": "ep_f5f44da5",
+      "fault": 14,
+      "group": "known",
+      "top3": [
+        14,
+        11,
+        18
+      ],
+      "top3_probability": [
+        0.98,
+        0.02,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_34e9fa40",
+      "fault": 5,
+      "group": "known",
+      "top3": [
+        5,
+        12,
+        13
+      ],
+      "top3_probability": [
+        0.84,
+        0.05,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_da9277da",
+      "fault": 3,
+      "group": "hard",
+      "top3": [
+        3,
+        15,
+        0
+      ],
+      "top3_probability": [
+        0.26,
+        0.26,
+        0.17
+      ]
+    },
+    {
+      "episode": "ep_f8ff0dc8",
+      "fault": 8,
+      "group": "known",
+      "top3": [
+        8,
+        20,
+        3
+      ],
+      "top3_probability": [
+        0.49,
+        0.09,
+        0.08
+      ]
+    },
+    {
+      "episode": "ep_f233e687",
+      "fault": 13,
+      "group": "known",
+      "top3": [
+        13,
+        10,
+        16
+      ],
+      "top3_probability": [
+        0.4,
+        0.13,
+        0.08
+      ]
+    },
+    {
+      "episode": "ep_a500c935",
+      "fault": 2,
+      "group": "known",
+      "top3": [
+        2,
+        0,
+        3
+      ],
+      "top3_probability": [
+        0.98,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_9b369fa3",
+      "fault": 13,
+      "group": "known",
+      "top3": [
+        13,
+        8,
+        12
+      ],
+      "top3_probability": [
+        0.88,
+        0.04,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_55b3a7b9",
+      "fault": 20,
+      "group": "unknown-type",
+      "top3": [
+        20,
+        5,
+        19
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_2c266e18",
+      "fault": 17,
+      "group": "unknown-type",
+      "top3": [
+        17,
+        14,
+        11
+      ],
+      "top3_probability": [
+        0.99,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_140f0ad2",
+      "fault": 7,
+      "group": "known",
+      "top3": [
+        7,
+        8,
+        12
+      ],
+      "top3_probability": [
+        0.81,
+        0.08,
+        0.05
+      ]
+    },
+    {
+      "episode": "ep_9756ffd8",
+      "fault": 20,
+      "group": "unknown-type",
+      "top3": [
+        20,
+        8,
+        0
+      ],
+      "top3_probability": [
+        0.97,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_4da9e263",
+      "fault": 17,
+      "group": "unknown-type",
+      "top3": [
+        17,
+        11,
+        20
+      ],
+      "top3_probability": [
+        0.99,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_08b3678f",
+      "fault": 10,
+      "group": "known",
+      "top3": [
+        10,
+        16,
+        15
+      ],
+      "top3_probability": [
+        0.81,
+        0.12,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_a7f54914",
+      "fault": 2,
+      "group": "known",
+      "top3": [
+        2,
+        9,
+        0
+      ],
+      "top3_probability": [
+        0.9,
+        0.03,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_fab8b4a5",
+      "fault": 15,
+      "group": "hard",
+      "top3": [
+        15,
+        0,
+        9
+      ],
+      "top3_probability": [
+        0.25,
+        0.24,
+        0.19
+      ]
+    },
+    {
+      "episode": "ep_ef6c325b",
+      "fault": 5,
+      "group": "known",
+      "top3": [
+        5,
+        13,
+        12
+      ],
+      "top3_probability": [
+        0.8,
+        0.08,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_928bf007",
+      "fault": 16,
+      "group": "unknown-type",
+      "top3": [
+        16,
+        10,
+        9
+      ],
+      "top3_probability": [
+        0.91,
+        0.06,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_2a699431",
+      "fault": 1,
+      "group": "known",
+      "top3": [
+        1,
+        8,
+        6
+      ],
+      "top3_probability": [
+        0.55,
+        0.36,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_099c0ef7",
+      "fault": 14,
+      "group": "known",
+      "top3": [
+        14,
+        19,
+        18
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_11cad6aa",
+      "fault": 18,
+      "group": "unknown-type",
+      "top3": [
+        18,
+        15,
+        20
+      ],
+      "top3_probability": [
+        0.85,
+        0.04,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_2840db0d",
+      "fault": 2,
+      "group": "known",
+      "top3": [
+        2,
+        8,
+        13
+      ],
+      "top3_probability": [
+        0.95,
+        0.02,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_fd5d05d6",
+      "fault": 18,
+      "group": "unknown-type",
+      "top3": [
+        18,
+        12,
+        5
+      ],
+      "top3_probability": [
+        0.79,
+        0.08,
+        0.05
+      ]
+    },
+    {
+      "episode": "ep_3ea921d1",
+      "fault": 17,
+      "group": "unknown-type",
+      "top3": [
+        17,
+        11,
+        20
+      ],
+      "top3_probability": [
+        0.98,
+        0.02,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_bbd017e6",
+      "fault": 19,
+      "group": "unknown-type",
+      "top3": [
+        19,
+        20,
+        15
+      ],
+      "top3_probability": [
+        0.98,
+        0.02,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_146f9c73",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        10,
+        16,
+        15
+      ],
+      "top3_probability": [
+        0.34,
+        0.26,
+        0.1
+      ]
+    },
+    {
+      "episode": "ep_41499fd9",
+      "fault": 17,
+      "group": "unknown-type",
+      "top3": [
+        17,
+        12,
+        8
+      ],
+      "top3_probability": [
+        0.99,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_cc4e388b",
+      "fault": 10,
+      "group": "known",
+      "top3": [
+        10,
+        16,
+        7
+      ],
+      "top3_probability": [
+        0.78,
+        0.1,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_9aab2900",
+      "fault": 1,
+      "group": "known",
+      "top3": [
+        1,
+        8,
+        6
+      ],
+      "top3_probability": [
+        0.49,
+        0.41,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_774d8d53",
+      "fault": 16,
+      "group": "unknown-type",
+      "top3": [
+        16,
+        10,
+        5
+      ],
+      "top3_probability": [
+        0.81,
+        0.14,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_1e365061",
+      "fault": 1,
+      "group": "known",
+      "top3": [
+        1,
+        8,
+        6
+      ],
+      "top3_probability": [
+        0.52,
+        0.36,
+        0.05
+      ]
+    },
+    {
+      "episode": "ep_5bd70fc9",
+      "fault": 9,
+      "group": "hard",
+      "top3": [
+        3,
+        9,
+        0
+      ],
+      "top3_probability": [
+        0.37,
+        0.22,
+        0.16
+      ]
+    },
+    {
+      "episode": "ep_6d85d734",
+      "fault": 7,
+      "group": "known",
+      "top3": [
+        7,
+        12,
+        8
+      ],
+      "top3_probability": [
+        0.75,
+        0.08,
+        0.06
+      ]
+    },
+    {
+      "episode": "ep_222f759a",
+      "fault": 19,
+      "group": "unknown-type",
+      "top3": [
+        19,
+        20,
+        13
+      ],
+      "top3_probability": [
+        0.99,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_d9c06aa9",
+      "fault": 16,
+      "group": "unknown-type",
+      "top3": [
+        16,
+        10,
+        20
+      ],
+      "top3_probability": [
+        0.94,
+        0.05,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_5c696f3b",
+      "fault": 20,
+      "group": "unknown-type",
+      "top3": [
+        20,
+        13,
+        7
+      ],
+      "top3_probability": [
+        0.95,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_9545479e",
+      "fault": 17,
+      "group": "unknown-type",
+      "top3": [
+        17,
+        11,
+        20
+      ],
+      "top3_probability": [
+        0.99,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_d4c06b28",
+      "fault": 0,
+      "group": "normal",
+      "top3": [
+        3,
+        15,
+        0
+      ],
+      "top3_probability": [
+        0.28,
+        0.25,
+        0.19
+      ]
+    },
+    {
+      "episode": "ep_0f4a1317",
+      "fault": 15,
+      "group": "hard",
+      "top3": [
+        9,
+        0,
+        3
+      ],
+      "top3_probability": [
+        0.26,
+        0.22,
+        0.21
+      ]
+    },
+    {
+      "episode": "ep_ba5b9671",
+      "fault": 1,
+      "group": "known",
+      "top3": [
+        1,
+        8,
+        13
+      ],
+      "top3_probability": [
+        0.59,
+        0.3,
+        0.04
+      ]
+    },
+    {
+      "episode": "ep_010f9920",
+      "fault": 6,
+      "group": "known",
+      "top3": [
+        6,
+        8,
+        1
+      ],
+      "top3_probability": [
+        0.88,
+        0.07,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_7a40d6a2",
+      "fault": 4,
+      "group": "known",
+      "top3": [
+        4,
+        20,
+        10
+      ],
+      "top3_probability": [
+        0.63,
+        0.06,
+        0.06
+      ]
+    },
+    {
+      "episode": "ep_c0b23ac8",
+      "fault": 11,
+      "group": "known",
+      "top3": [
+        11,
+        19,
+        18
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_6972109a",
+      "fault": 7,
+      "group": "known",
+      "top3": [
+        7,
+        12,
+        8
+      ],
+      "top3_probability": [
+        0.74,
+        0.1,
+        0.08
+      ]
+    },
+    {
+      "episode": "ep_fd9e96bb",
+      "fault": 4,
+      "group": "known",
+      "top3": [
+        4,
+        11,
+        15
+      ],
+      "top3_probability": [
+        0.92,
+        0.04,
+        0.01
+      ]
+    },
+    {
+      "episode": "ep_4c5959e5",
+      "fault": 14,
+      "group": "known",
+      "top3": [
+        14,
+        19,
+        18
+      ],
+      "top3_probability": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_8a41667f",
+      "fault": 8,
+      "group": "known",
+      "top3": [
+        8,
+        13,
+        1
+      ],
+      "top3_probability": [
+        0.86,
+        0.03,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_1aefa200",
+      "fault": 14,
+      "group": "known",
+      "top3": [
+        14,
+        11,
+        17
+      ],
+      "top3_probability": [
+        0.88,
+        0.03,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_ba1e5294",
+      "fault": 11,
+      "group": "known",
+      "top3": [
+        11,
+        14,
+        19
+      ],
+      "top3_probability": [
+        0.85,
+        0.03,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_c9ea2ad1",
+      "fault": 19,
+      "group": "unknown-type",
+      "top3": [
+        19,
+        20,
+        13
+      ],
+      "top3_probability": [
+        0.98,
+        0.01,
+        0.0
+      ]
+    },
+    {
+      "episode": "ep_f4fd1164",
+      "fault": 5,
+      "group": "known",
+      "top3": [
+        5,
+        8,
+        12
+      ],
+      "top3_probability": [
+        0.55,
+        0.18,
+        0.1
+      ]
+    },
+    {
+      "episode": "ep_4851dd18",
+      "fault": 1,
+      "group": "known",
+      "top3": [
+        1,
+        8,
+        12
+      ],
+      "top3_probability": [
+        0.53,
+        0.39,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_30b14261",
+      "fault": 13,
+      "group": "known",
+      "top3": [
+        13,
+        12,
+        8
+      ],
+      "top3_probability": [
+        0.88,
+        0.03,
+        0.02
+      ]
+    },
+    {
+      "episode": "ep_09fa8f20",
+      "fault": 10,
+      "group": "known",
+      "top3": [
+        10,
+        16,
+        9
+      ],
+      "top3_probability": [
+        0.88,
+        0.07,
+        0.03
+      ]
+    },
+    {
+      "episode": "ep_17732276",
+      "fault": 3,
+      "group": "hard",
+      "top3": [
+        3,
+        0,
+        9
+      ],
+      "top3_probability": [
+        0.3,
+        0.2,
+        0.19
+      ]
+    }
+  ]
+}
