@@ -174,3 +174,19 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 **Alternative measured, not used:** training with faults 3, 9 and 15 merged into "normal" gives 8 of 10 normal runs right and 13 of 15 hard runs answered "no fault", with known and unknown-type faults unchanged. We keep the plain version: merging would use our knowledge of which faults are hard to detect (the grading groups) to shape the training, and the plain version is the standard way such a classifier is built.
 
 **What this means for the comparison:** B2 sets a high bar on faults it has seen many labelled examples of, which a real plant rarely has, and it explains nothing. The agent's possible advantages are elsewhere: saying "no fault" or "inconclusive" when the data is ambiguous, and backing its answer with checked evidence.
+
+## 2026-11-11: How the plant server is built (first three tools)
+
+**What:** the MCP server `plant-historian` is the agent's only way to see the plant. Its first three tools are `get_episode_info` (why the investigation started, and what time it is "now"), `list_tags` (the 52 signals, optionally for one process unit) and `get_trend` (one signal over a time window).
+
+**Choices:**
+- **One server per episode.** The server is started for one episode (`python -m plantagent.mcp_server --episode <name>`) and can only see that one. The agent will start a fresh server for each investigation.
+- **Two locks against seeing the future.** The episode files already stop at "now", and the loader cuts the table at "now" again. On top of that, every tool cuts its time window at "now" (`clip_window`). A test hands the tools a table that wrongly goes past "now" and checks that nothing after "now" comes out.
+- **The server can't reach the answers.** It reads only the episode list (`episodes/dev.jsonl` or `test.jsonl`), the episode's own signal file and `knowledge/tags.csv`. A test scans the server's code to make sure it never mentions the answer key or the converted data files, and the loader refuses any list other than "dev" and "test".
+- **Fixed result forms with a call ID.** Each tool returns a Pydantic model, so its numbers arrive as named fields as well as text. Every result carries a `call_id` (c1, c2, ...) that the agent must cite as evidence; the evidence checker will look claims up by that ID.
+- **Short results.** Values have 6 significant digits, and `get_trend` returns at most 40 points by default (spread evenly, always including the first and last), while its minimum, maximum, mean, first and last use every sample in the window.
+- **Mistakes come back as readable errors.** An unknown tag, a badly written time, or a window that starts after "now" raises a `ToolError`, whose message tells the model how to fix its request (for example, "call list_tags to see all 52").
+
+**Trying it without the MCP Inspector:** the Inspector needs Node.js, which isn't installed on this laptop. `python -m plantagent.mcp_server.demo` does the same job: it starts the server as a separate program, connects to it over stdio exactly as the agent will, and calls each tool, including one deliberate mistake.
+
+**A test caught the trend tool showing the future (same day).** The first version of `get_trend` called `clip_window` but didn't use the safe window it returned: it went on reading rows with the window as requested. The test that gives the tools a table running 20 moments past "now" caught it: asked for 04:00 to 10:00 with "now" at 05:00, the tool returned a value from 06:00. Fixed by reading rows only inside the window that `clip_window` returns. This is exactly the leak the "nothing after now" tests exist for, and why the test table deliberately holds data past "now".

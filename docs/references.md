@@ -12,6 +12,11 @@ The sources this project relies on, and what each one was used for.
 
 - [First steps](https://py.sdk.modelcontextprotocol.io/get-started/first-steps/) (MCP Python SDK documentation, version 2). Host, client and server; tools; how one decorator turns a Python function into a tool, with its description and argument form read from the function itself.
 - [Testing](https://py.sdk.modelcontextprotocol.io/get-started/testing/) (MCP Python SDK documentation). Connecting a client to a server object directly, in memory, which is how `tests/test_smoke_mcp.py` works.
+- [What's new in v2](https://py.sdk.modelcontextprotocol.io/whats-new/) (MCP Python SDK documentation). The names that changed since version 1 (`MCPServer`, `Client`, `is_error`), checked before writing the plant server so it uses the current ones.
+- [Tools](https://py.sdk.modelcontextprotocol.io/servers/tools/) (MCP Python SDK documentation). How each argument gets a description and limits the model can read, and how a tool is marked as read-only; used in `src/plantagent/mcp_server/server.py`.
+- [Structured Output](https://py.sdk.modelcontextprotocol.io/servers/structured-output/) (MCP Python SDK documentation). How a tool that returns a fixed form (a Pydantic model) sends its fields as named data as well as text; the basis of `src/plantagent/mcp_server/models.py`.
+- [Handling errors](https://py.sdk.modelcontextprotocol.io/servers/handling-errors/) (MCP Python SDK documentation). Why our tools raise `ToolError`: its message reaches the model, which can correct its request, while other crashes only show a generic message.
+- [Transports](https://py.sdk.modelcontextprotocol.io/client/transports/) (MCP Python SDK documentation). How a client starts a server as a separate program and talks to it over standard input and output (stdio); used in `src/plantagent/mcp_server/demo.py`.
 
 ## The language model (Ollama)
 
