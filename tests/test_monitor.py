@@ -4,6 +4,7 @@ import numpy as np
 
 from plantagent.config import load_config
 from plantagent.convert_data import runs_between
+from plantagent.monitor.alarms import consecutive_alarm
 from plantagent.monitor.patterns import choose_number_of_patterns, fit_patterns
 from plantagent.monitor.scores import alarm_limit, spe_scores, t2_scores
 from plantagent.monitor.standardize import fit_normal_stats, standardize
@@ -98,3 +99,15 @@ def test_alarm_limit_leaves_1_percent_of_healthy_scores_above_it():
     healthy_scores = np.arange(1, 1001)  # 1, 2, ..., 1000
     limit = alarm_limit(healthy_scores, 99)
     assert np.mean(healthy_scores > limit) == 0.01  # exactly 10 of the 1000 are above
+
+
+def test_alarm_only_after_enough_moments_in_a_row():
+    above = np.array([False, True, True, False, True, True, True])
+    assert list(consecutive_alarm(above, 1)) == [False, True, True, False, True, True, True]
+    assert list(consecutive_alarm(above, 2)) == [False, False, True, False, False, True, True]
+    assert list(consecutive_alarm(above, 3)) == [False, False, False, False, False, False, True]
+
+
+def test_a_streak_broken_by_one_normal_moment_starts_again():
+    above = np.array([True, True, False, True, True])
+    assert not consecutive_alarm(above, 3).any()  # never 3 in a row

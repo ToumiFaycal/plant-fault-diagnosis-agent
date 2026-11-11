@@ -120,3 +120,19 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 - Development run 1, normal operation: 1.2 % of moments above the T² limit and 0.6 % above the SPE limit before 8:00, 1.6 % and 1.5 % after. That's close to the 1 % chosen, and it means a monitor that alarms on a single moment would cry wolf around a dozen times in a 48-hour healthy run. Hence the next stage: alarm only when the scores stay above their limits for several moments in a row.
 - Development run 1 of fault 4: after 8:00, **99.8 %** of moments are above the SPE limit, but only 38.8 % above the T² limit. This fault shows up mainly as a strange pattern, not a strange amount (the cooling water valve moves while the temperature stays put).
 - Fault 3 changes the plant so little that its scores after 8:00 look like the normal run's (1.6 % and 1.5 % above the limits).
+
+## 2026-11-11: Alarm only after 3 moments in a row above a limit
+
+**The problem:** about 2 % of healthy moments have at least one score above its limit, so alarming on a single moment would cry wolf all day. The rule: alarm only when the scores stay above a limit for several moments in a row.
+
+**The plan's rule wasn't enough:** it said to pick the number of moments so that under 1 % of healthy moments are in alarm. Two in a row already passes that (0.34 % on the calibration runs). But measured run by run, two in a row still makes 35 of the 50 healthy calibration runs alarm at least once. Worse, 60 of the 100 development fault runs alarm *before their fault even starts*. An investigation triggered by such an alarm would look at a plant that is still healthy, while its label says "fault".
+
+**Measured** (calibration: runs 101–150, 25 h each; development: normal runs 1–10 and runs 1–5 of each fault, 48 h each):
+
+| Moments in a row | Healthy calibration runs with an alarm | Normal dev runs with an alarm | Fault runs alarming before the fault | Fault runs detected | Median delay |
+|---|---|---|---|---|---|
+| 2 | 35 of 50 | 10 of 10 | 60 of 100 | 100 of 100 (helped by false alarms) | 48 min |
+| **3** | **10 of 50** | **3 of 10** | **0 of 100** | **86 of 100** | **34 min** |
+| 6 | 0 of 50 | 0 of 10 | 0 of 100 | 81 of 100 | 48 min |
+
+**Choice: 3 in a row**, set in `config.toml`. It is the smallest number with no development fault run alarming before its fault, it keeps all detectable faults, and it reacts fastest. The price is an occasional false alarm on a healthy run (3 of 10 development runs over 48 hours). This choice used the development runs, never the test runs.

@@ -24,3 +24,15 @@ def load_signals(folder: str, fault: int, runs: set[int]) -> np.ndarray:
     table = pd.read_parquet(processed_dir / folder / f"fault_{fault:02d}.parquet")
     table = table[table["simulationRun"].isin(runs)]
     return table[SIGNALS].to_numpy()  # drop the names: rows = moments, columns = signals
+
+
+def load_signals_by_run(folder: str, fault: int, runs: set[int]) -> dict[int, np.ndarray]:
+    """Like load_signals, but keeps the runs apart: {run number: table of that run's signals}.
+
+    Needed when something must not run across the end of one run into the next one,
+    like counting moments in a row.
+    """
+    processed_dir = PROJECT_ROOT / load_config()["data"]["processed_dir"]
+    table = pd.read_parquet(processed_dir / folder / f"fault_{fault:02d}.parquet")
+    table = table[table["simulationRun"].isin(runs)]
+    return {int(run): part[SIGNALS].to_numpy() for run, part in table.groupby("simulationRun")}
