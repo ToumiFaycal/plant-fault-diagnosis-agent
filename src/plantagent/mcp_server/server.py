@@ -7,23 +7,27 @@ is cut at the episode's "now".
 What the model sees of each tool comes from this file: the function name, its docstring, and the
 description of each argument. Writing them clearly is part of the design.
 
-Run by hand (normally the agent starts it), after saving the monitor once
-(python -m plantagent.monitor.saved):
+Run by hand (normally the agent starts it), after saving the monitor and the document search
+index once (python -m plantagent.monitor.saved, then python -m plantagent.docsearch):
     python -m plantagent.mcp_server --episode ep_f6f8d79c
 It then waits for an MCP client on stdio (standard input and output), so it shows nothing itself.
 """
 
 import argparse
 import itertools
+import logging
 from typing import Annotated, Literal
 
 from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
+from plantagent.config import load_config
+from plantagent.docsearch import DocIndex, index_path, knowledge_sections, load_index
 from plantagent.mcp_server import tools
 from plantagent.mcp_server.episode import EPISODE_LISTS, Episode, load_episode
-from plantagent.mcp_server.models import Contributors, EpisodeInfo, MonitorStatus, NormalComparison, TagList, Trend
+from plantagent.mcp_server.models import (Contributors, DocSearchResult, EpisodeInfo, MonitorStatus, NormalComparison,
+                                          TagList, Trend)
 from plantagent.mcp_server.windows import CLOCK_PATTERN
 from plantagent.monitor.saved import load_monitor, monitor_path
 
@@ -38,9 +42,11 @@ INSTRUCTIONS = (
 Clock = Annotated[str, Field(pattern=CLOCK_PATTERN, description="A time as HH:MM from the start of the run, like '08:30'.")]
 
 
-def build_server(episode: Episode, monitor: dict) -> MCPServer:
-    """An MCP server whose tools can see this episode, and only this episode, plus the saved monitor."""
+def build_server(episode: Episode, monitor: dict, docs: DocIndex) -> MCPServer:
+    """An MCP server whose tools can see this episode, and only this episode, plus the saved monitor
+    and the plant's reference documents."""
     server = MCPServer("plant-historian", instructions=INSTRUCTIONS)
+    doc_settings = load_config()["docs"]
     call_numbers = itertools.count(1)
 
     def next_call_id() -> str:
@@ -105,6 +111,17 @@ def build_server(episode: Episode, monitor: dict) -> MCPServer:
         where a problem started: controllers move valves to hold measurements steady."""
         return tools.contributors(episode, monitor, window_start, window_end, k, statistic, next_call_id())
 
+    @server.tool(annotations=READ_ONLY)
+    def search_docs(
+        query: Annotated[str, Field(min_length=3, max_length=200, description="What to look up, in plain words, like 'condenser cooling water'.")],
+    ) -> DocSearchResult:
+        """Search the plant's reference documents by meaning: how the plant works (its units,
+        streams, reactions, analysers and control system) and the catalogue of faults that can be
+        switched on (faults 1 to 20: what changes, where, and what kind of change, when known).
+        Returns up to 3 sections, most similar first, each with a section_id to cite. The catalogue
+        describes causes only, not how a fault shows up in the measurements."""
+        return tools.document_search(docs, query, doc_settings["results"], doc_settings["cutoff"], next_call_id())
+
     return server
 
 
@@ -115,8 +132,15 @@ def main() -> None:
     arguments = parser.parse_args()
     if not monitor_path().exists():
         raise SystemExit("The saved monitor is missing: run  python -m plantagent.monitor.saved  first.")
+    if not index_path().exists():
+        raise SystemExit("The document search index is missing: run  python -m plantagent.docsearch  first.")
+    try:
+        docs = load_index(index_path(), knowledge_sections())
+    except ValueError as problem:  # the documents were edited after the index was built
+        raise SystemExit(str(problem)) from None
     episode, monitor = load_episode(arguments.episode, arguments.split), load_monitor(monitor_path())
-    build_server(episode, monitor).run()  # stdio: stdin/stdout carry the messages
+    logging.getLogger("httpx").setLevel(logging.WARNING)  # no line per search request to Ollama
+    build_server(episode, monitor, docs).run()  # stdio: stdin/stdout carry the messages
 
 
 if __name__ == "__main__":

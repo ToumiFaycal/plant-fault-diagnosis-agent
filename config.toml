@@ -8,6 +8,7 @@ first_faulty_sample_training = 21   # faults start 1 hour into training runs (ch
 first_faulty_sample_testing = 161   # and 8 hours into testing runs (dev and test)
 episodes_dir = "data/episodes"      # what each investigation is allowed to see (labels never go here)
 monitor_file = "data/monitor/monitor.npz"  # what the monitor learned, saved once, so the server needn't fit it
+docs_index_file = "data/docs/index.npz"     # the meaning of each knowledge section, computed once (python -m plantagent.docsearch)
 
 # Which recorded runs are used for what. Each range includes both ends.
 [splits]
@@ -48,3 +49,9 @@ num_ctx = 16384   # how much conversation (in tokens) the model can see at once;
 temperature = 0   # 0 = always pick the most likely next word, so answers repeat from run to run
 seed = 42         # fixes the randomness that remains
 think = false     # Qwen3's slower "thinking mode"; whether it helps is measured later
+
+# Searching the plant's reference documents (knowledge/) by meaning.
+[docs]
+embedding_model = "embeddinggemma"  # turns a text into 768 numbers that capture its meaning (run by Ollama)
+results = 3      # at most this many sections per search
+cutoff = 0.35    # sections less similar than this are left out (chosen from test questions; see docs/DECISIONS.md)

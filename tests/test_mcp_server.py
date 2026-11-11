@@ -12,6 +12,7 @@ from mcp import Client
 from mcp.server.mcpserver.exceptions import ToolError
 
 from plantagent.config import PROJECT_ROOT, load_config
+from plantagent.docsearch import DocIndex, Section
 from plantagent.episodes.build import episode_table
 from plantagent.mcp_server.episode import Episode, load_episode
 from plantagent.mcp_server.server import build_server
@@ -39,9 +40,28 @@ def made_up_monitor() -> dict:
             "kept": 2, "t2_limit": 8.0, "spe_limit": 200.0, "alarm_after_consecutive": 3}
 
 
+def made_up_docs() -> DocIndex:
+    """Three document sections whose "meanings" point in three different directions, and a made-up
+    way to turn a question into an arrow (a 4th direction stands for "something else")."""
+    sections = [Section(f"doc#{name}", name.title(), f"About the {name}.") for name in ("reactor", "condenser", "stripper")]
+    questions = {"mostly the reactor": [0.8, 0.6, 0.0, 0.0],  # similarities 0.8, 0.6 and 0
+                 "something else": [0.0, 0.0, 0.0, 1.0]}       # similar to nothing
+
+    def embed_query(query: str) -> np.ndarray:
+        if query == "ollama is off":
+            raise ConnectionError("Failed to connect to Ollama.")
+        return np.array(questions[query])
+
+    return DocIndex(sections=sections, vectors=np.eye(4)[:3], embed_query=embed_query)
+
+
+def made_up_server():
+    return build_server(made_up_episode(), made_up_monitor(), made_up_docs())
+
+
 async def call_tools(calls: list[tuple[str, dict]]) -> list:
     """Connect one client to a server for the made-up episode and make these tool calls, in order."""
-    async with Client(build_server(made_up_episode(), made_up_monitor())) as client:
+    async with Client(made_up_server()) as client:
         return [await client.call_tool(name, arguments) for name, arguments in calls]
 
 
@@ -93,14 +113,14 @@ def test_evenly_spaced_keeps_the_first_and_the_last():
 
 # --- The server and its tools ---
 
-def test_the_server_offers_six_read_only_tools():
+def test_the_server_offers_seven_read_only_tools():
     async def list_tools():
-        async with Client(build_server(made_up_episode(), made_up_monitor())) as client:
+        async with Client(made_up_server()) as client:
             return await client.list_tools()
 
     tools = asyncio.run(list_tools()).tools
     assert {tool.name for tool in tools} == {"get_episode_info", "list_tags", "get_trend", "compare_to_normal",
-                                             "get_monitor_status", "top_contributors"}
+                                             "get_monitor_status", "top_contributors", "search_docs"}
     assert all(tool.annotations.read_only_hint for tool in tools)
 
 
@@ -234,6 +254,26 @@ def test_top_contributors_split_the_score():
 def test_a_monitor_tool_window_after_now_is_an_error():
     result = call_tool("top_contributors", {"window_start": "06:00", "window_end": "07:00"})
     assert result.is_error
+
+
+# --- Searching the documents ---
+
+def test_search_docs_gives_the_most_similar_sections_with_their_ids():
+    result = call_tool("search_docs", {"query": "mostly the reactor"}).structured_content
+    assert result["cutoff"] == load_config()["docs"]["cutoff"]
+    assert [(s["section_id"], s["similarity"]) for s in result["sections"]] == [("doc#reactor", 0.8),
+                                                                              ("doc#condenser", 0.6)]
+    assert result["sections"][0]["text"] == "About the reactor."
+
+
+def test_search_docs_can_find_nothing():
+    assert call_tool("search_docs", {"query": "something else"}).structured_content["sections"] == []
+
+
+def test_search_docs_without_ollama_is_a_readable_error():
+    result = call_tool("search_docs", {"query": "ollama is off"})
+    assert result.is_error
+    assert "Ollama" in result.content[0].text
 
 
 # --- The saved monitor ---

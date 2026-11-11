@@ -11,8 +11,10 @@ from mcp.server.mcpserver.exceptions import ToolError
 from plantagent.config import PROJECT_ROOT
 from plantagent.episodes.build import MINUTES_PER_SAMPLE, sample_time
 from plantagent.mcp_server.episode import Episode
-from plantagent.mcp_server.models import (Contributor, Contributors, EpisodeInfo, MonitorStatus, NormalComparison,
-                                          ScoreVsLimit, SignalVsNormal, TagInfo, TagList, Trend, TrendPoint)
+from plantagent.docsearch import DocIndex, search
+from plantagent.mcp_server.models import (Contributor, Contributors, DocSearchResult, DocSection, EpisodeInfo,
+                                          MonitorStatus, NormalComparison, ScoreVsLimit, SignalVsNormal, TagInfo,
+                                          TagList, Trend, TrendPoint)
 from plantagent.mcp_server.windows import clip_window, clock_to_sample, evenly_spaced
 from plantagent.monitor.alarms import alarm_run
 from plantagent.monitor.contributions import contributions_of_run, top_contributors
@@ -180,4 +182,19 @@ def contributors(episode: Episode, monitor: dict, window_start: str, window_end:
         contributors=[Contributor(rank=rank, tag=tag, description=check_tag(tag)["description"],
                                   process_unit=check_tag(tag)["process_unit"], share_percent=round(share * 100, 1))
                       for rank, (tag, share) in enumerate(ranked, start=1)],
+    )
+
+
+# --- Searching the documents (step 7.3) ---
+
+def document_search(docs: DocIndex, query: str, results: int, cutoff: float, call_id: str) -> DocSearchResult:
+    try:
+        found = search(docs, query, results, cutoff)  # your cosine_similarities does the comparing
+    except ConnectionError:  # the question's meaning is computed by Ollama, which must be running
+        raise ToolError("The document search is unavailable right now (Ollama is not running).") from None
+    return DocSearchResult(
+        call_id=call_id, query=query, cutoff=cutoff,
+        sections=[DocSection(section_id=section.section_id, title=section.title,
+                             similarity=round(similarity, 3), text=section.text)
+                  for section, similarity in found],
     )

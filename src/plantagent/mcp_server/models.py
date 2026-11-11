@@ -113,3 +113,17 @@ class Contributors(WindowResult):
     average_score: float = Field(description="The score's average over the window.")
     limit: float = Field(description="The score's alarm limit.")
     contributors: list[Contributor] = Field(description="Biggest share first. All 52 shares add up to 100 %.")
+
+
+class DocSection(BaseModel):
+    section_id: str = Field(description="Cite this ID as evidence for anything you take from this section.")
+    title: str
+    similarity: float = Field(description="How close in meaning to the query: 1 = same meaning, 0 = unrelated.")
+    text: str
+
+
+class DocSearchResult(ToolResult):
+    query: str
+    cutoff: float = Field(description="Sections less similar to the query than this are left out.")
+    sections: list[DocSection] = Field(description="Most similar first. Empty if no section reaches the cutoff: "
+                                                   "try other words.")

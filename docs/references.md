@@ -22,6 +22,8 @@ The sources this project relies on, and what each one was used for.
 
 - [Tool calling](https://docs.ollama.com/capabilities/tool-calling) (Ollama documentation). How a model is offered tools and how it replies with a request to run one; the basis of `src/plantagent/smoke_ollama.py`.
 - [FAQ: how can I specify the context window size?](https://docs.ollama.com/faq) (Ollama documentation). Ollama's default context is 4,096 tokens, which is why we always set `num_ctx` ourselves.
+- [Embeddings](https://docs.ollama.com/capabilities/embeddings) (Ollama documentation). How to turn a text into a list of numbers that captures its meaning (`ollama.embed`); the vectors come back with length 1, and cosine similarity is the recommended way to compare them. Used in `src/plantagent/docsearch.py`.
+- [EmbeddingGemma model card](https://ai.google.dev/gemma/docs/embeddinggemma/model_card) (Google). The embedding model we use: 768 numbers per text, at most 2,048 tokens of input, and the fixed forms it expects for questions (`task: search result | query: ...`) and documents (`title: ... | text: ...`).
 
 ## The plant itself
 

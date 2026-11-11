@@ -2,8 +2,9 @@
 
 The demo is the client. It starts the server (`python -m plantagent.mcp_server --episode ...`),
 connects over stdio, lists the tools, calls each one, and shows one deliberate mistake coming back
-as an error the model could read. The server needs the saved monitor: run
-`python -m plantagent.monitor.saved` once first.
+as an error the model could read. The server needs the saved monitor and the document search
+index: run `python -m plantagent.monitor.saved` and `python -m plantagent.docsearch` once first,
+and keep Ollama running (it computes the meaning of each search).
 
 Run it with:
     python -m plantagent.mcp_server.demo
@@ -66,6 +67,11 @@ async def talk_to_server(episode: str) -> None:
         compared = await client.call_tool("compare_to_normal", {"tags": tags, "window_start": hour_ago,
                                                                 "window_end": now_time})
         show(f'compare_to_normal({tags}, "{hour_ago}", "{now_time}"): the signals found just above', compared)
+
+        # Looking something up in the plant's documents: by meaning, so the words needn't match exactly.
+        for query in ("separator temperature", "how to bake bread"):
+            found = await client.call_tool("search_docs", {"query": query})
+            show(f'search_docs("{query}")', found)
 
 
 def main() -> None:
