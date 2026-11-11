@@ -3,6 +3,8 @@
 
 import asyncio
 import json
+import re
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -13,8 +15,10 @@ from plantagent.config import PROJECT_ROOT, load_config
 from plantagent.episodes.build import episode_table
 from plantagent.mcp_server.episode import Episode, load_episode
 from plantagent.mcp_server.server import build_server
+from plantagent.mcp_server.tools import z_score_and_direction
 from plantagent.mcp_server.windows import clip_window, clock_to_sample, evenly_spaced
 from plantagent.monitor.data import SIGNALS
+from plantagent.monitor.saved import load_monitor, monitor_path
 
 
 def made_up_episode() -> Episode:
@@ -25,9 +29,19 @@ def made_up_episode() -> Episode:
                    now_sample=100, table=episode_table(X, 120))
 
 
+def made_up_monitor() -> dict:
+    """A monitor simple enough to work out by hand: every signal's normal average is 50 and its
+    wobble 10, so a value v has z = (v - 50) / 10. It keeps 2 ways of moving (signals 1 and 2 alone),
+    so with all 52 signals equal: T² = 2 z² and SPE = 50 z². Both limits are passed exactly when
+    |z| > 2, that is v > 70 or v < 30."""
+    patterns = SimpleNamespace(components_=np.eye(len(SIGNALS))[:2], explained_variance_=np.ones(2))
+    return {"averages": np.full(len(SIGNALS), 50.0), "wobbles": np.full(len(SIGNALS), 10.0), "patterns": patterns,
+            "kept": 2, "t2_limit": 8.0, "spe_limit": 200.0, "alarm_after_consecutive": 3}
+
+
 async def call_tools(calls: list[tuple[str, dict]]) -> list:
     """Connect one client to a server for the made-up episode and make these tool calls, in order."""
-    async with Client(build_server(made_up_episode())) as client:
+    async with Client(build_server(made_up_episode(), made_up_monitor())) as client:
         return [await client.call_tool(name, arguments) for name, arguments in calls]
 
 
@@ -79,13 +93,14 @@ def test_evenly_spaced_keeps_the_first_and_the_last():
 
 # --- The server and its tools ---
 
-def test_the_server_offers_three_read_only_tools():
+def test_the_server_offers_six_read_only_tools():
     async def list_tools():
-        async with Client(build_server(made_up_episode())) as client:
+        async with Client(build_server(made_up_episode(), made_up_monitor())) as client:
             return await client.list_tools()
 
     tools = asyncio.run(list_tools()).tools
-    assert {tool.name for tool in tools} == {"get_episode_info", "list_tags", "get_trend"}
+    assert {tool.name for tool in tools} == {"get_episode_info", "list_tags", "get_trend", "compare_to_normal",
+                                             "get_monitor_status", "top_contributors"}
     assert all(tool.annotations.read_only_hint for tool in tools)
 
 
@@ -144,6 +159,103 @@ def test_each_call_gets_its_own_call_id():
     assert second.structured_content["call_id"] == "c2"
 
 
+# --- The monitor's tools (z_score_and_direction is yours) ---
+# Reminder: in the made-up episode every signal equals its sample number, and in the made-up monitor
+# z = (value - 50) / 10. So samples 80-100 (04:00-05:00) average 90 -> z = +4.
+
+def test_z_score_and_direction():
+    assert z_score_and_direction(90.0, 50.0, 10.0) == (4.0, "up")
+    assert z_score_and_direction(30.0, 50.0, 10.0) == (-2.0, "down")  # exactly 2 wobbles below counts
+    assert z_score_and_direction(51.0, 50.0, 10.0) == (0.1, "normal")
+    assert z_score_and_direction(120.46, 120.40, 0.02)[1] == "up"  # the reactor example: z = 3
+
+
+def test_compare_to_normal_up_down_and_normal():
+    def first_signal(window_start, window_end):
+        result = call_tool("compare_to_normal", {"tags": ["xmeas_9"], "window_start": window_start,
+                                                 "window_end": window_end}).structured_content
+        return result["signals"][0]
+
+    up = first_signal("04:00", "05:00")  # samples 80-100, average 90
+    assert (up["window_mean"], up["normal_mean"], up["normal_std"]) == (90.0, 50.0, 10.0)
+    assert (up["z_score"], up["direction"]) == (4.0, "up")
+    assert first_signal("01:00", "02:00")["direction"] == "down"  # samples 20-40, average 30: z = -2
+    assert first_signal("02:00", "03:00")["direction"] == "normal"  # samples 40-60, average 50: z = 0
+
+
+def test_compare_to_normal_also_stops_at_now():
+    result = call_tool("compare_to_normal", {"tags": ["xmeas_9", "xmv_10"], "window_start": "04:00",
+                                             "window_end": "10:00"}).structured_content
+    assert result["clipped_to_now"] is True and result["window_end"] == "05:00"
+    assert [signal["tag"] for signal in result["signals"]] == ["xmeas_9", "xmv_10"]
+    assert result["signals"][0]["window_mean"] == 90.0  # 80-100 only: with the future rows it would be 100
+
+
+def test_monitor_status_waits_for_three_moments_in_a_row():
+    # Above both limits from sample 71 (value 71 > 70). Three in a row: in alarm from sample 73 (03:39).
+    status = call_tool("get_monitor_status", {"window_start": "03:00", "window_end": "04:00"}).structured_content
+    assert status["t2"]["moments_above_limit"] == 10  # samples 71-80
+    assert (status["first_alarm_time"], status["first_alarm_sample"]) == ("03:39", 73)
+    assert status["moments_in_alarm"] == 8  # samples 73-80
+
+
+def test_monitor_status_counts_a_streak_that_began_before_the_window():
+    # The window starts at sample 74 (03:42); the streak began at 71, so the alarm is already on.
+    status = call_tool("get_monitor_status", {"window_start": "03:42", "window_end": "04:00"}).structured_content
+    assert status["first_alarm_time"] == "03:42"
+
+
+def test_monitor_status_of_a_quiet_window():
+    status = call_tool("get_monitor_status", {"window_start": "02:00", "window_end": "03:00"}).structured_content
+    assert status["first_alarm_time"] is None and status["moments_in_alarm"] == 0
+    assert status["spe"]["moments_above_limit"] == 0
+
+
+def test_monitor_status_highest_score():
+    status = call_tool("get_monitor_status", {"window_start": "04:00", "window_end": "05:00"}).structured_content
+    assert (status["t2"]["limit"], status["spe"]["limit"]) == (8.0, 200.0)
+    assert status["t2"]["highest"] == 50.0  # sample 100: z = 5, T² = 2 x 5²
+    assert status["t2"]["highest_sample_time"] == "05:00"
+
+
+def test_top_contributors_split_the_score():
+    # T² only looks along the 2 kept ways (signals 1 and 2): they share it half and half.
+    t2 = call_tool("top_contributors", {"window_start": "04:00", "window_end": "05:00", "k": 2}).structured_content
+    assert {c["tag"] for c in t2["contributors"]} == {"xmeas_1", "xmeas_2"}
+    assert [c["share_percent"] for c in t2["contributors"]] == [50.0, 50.0]
+    assert [c["rank"] for c in t2["contributors"]] == [1, 2]
+    # SPE is the leftover: the other 50 signals, 2 % each.
+    spe = call_tool("top_contributors", {"window_start": "04:00", "window_end": "05:00", "k": 3,
+                                         "statistic": "SPE"}).structured_content
+    assert len(spe["contributors"]) == 3
+    assert all(c["share_percent"] == 2.0 and c["tag"] not in ("xmeas_1", "xmeas_2") for c in spe["contributors"])
+
+
+def test_a_monitor_tool_window_after_now_is_an_error():
+    result = call_tool("top_contributors", {"window_start": "06:00", "window_end": "07:00"})
+    assert result.is_error
+
+
+# --- The saved monitor ---
+
+def test_the_saved_monitor_scores_like_the_original(tmp_path):
+    from plantagent.monitor.saved import save_monitor
+    from plantagent.monitor.scores import score_run
+
+    random = np.random.default_rng(0)
+    ways = np.linalg.qr(random.normal(size=(len(SIGNALS), 5)))[0].T  # 5 made-up ways, at right angles
+    original = {"averages": random.normal(size=len(SIGNALS)), "wobbles": random.uniform(0.5, 2, size=len(SIGNALS)),
+                "patterns": SimpleNamespace(components_=ways, explained_variance_=np.array([5.0, 4, 3, 2, 1])),
+                "kept": 3, "t2_limit": 12.3, "spe_limit": 45.6, "alarm_after_consecutive": 3}
+    save_monitor(original, tmp_path / "monitor.npz")
+    loaded = load_monitor(tmp_path / "monitor.npz")
+
+    X = random.normal(size=(30, len(SIGNALS)))
+    for before, after in zip(score_run(original, X), score_run(loaded, X)):
+        assert np.allclose(before, after)
+    assert (loaded["kept"], loaded["t2_limit"], loaded["spe_limit"]) == (3, 12.3, 45.6)
+
+
 # --- No answers, ever ---
 
 def test_the_server_code_never_mentions_the_answers():
@@ -169,3 +281,18 @@ def test_a_real_episode_stops_at_its_now():
     episode = load_episode(first["episode"])
     assert episode.table["sample"].max() == first["now_sample"]
     assert list(episode.table.columns) == ["sample", "sample_time"] + SIGNALS
+
+
+@pytest.mark.skipif(not (EPISODES_DIR.exists() and monitor_path().exists()),
+                    reason="needs the episode files and the saved monitor (never on GitHub)")
+def test_the_server_finds_the_same_first_alarm_as_the_episode_builder():
+    from plantagent.mcp_server.tools import monitor_status
+
+    monitor = load_monitor(monitor_path())
+    entries = [json.loads(line) for line in EPISODE_LIST.read_text(encoding="utf-8").splitlines()]
+    alarm_entries = [entry for entry in entries if "raised an alarm at" in entry["trigger_message"]]
+    assert alarm_entries
+    for entry in alarm_entries:
+        alarm_time = re.search(r"alarm at (\d+:\d{2})", entry["trigger_message"]).group(1)
+        status = monitor_status(load_episode(entry["episode"]), monitor, "00:00", entry["now_time"], "c1")
+        assert status.first_alarm_time == alarm_time, entry["episode"]

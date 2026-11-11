@@ -7,6 +7,7 @@ processed_dir = "data/processed"  # the Parquet files made by convert_data
 first_faulty_sample_training = 21   # faults start 1 hour into training runs (checked in the data)
 first_faulty_sample_testing = 161   # and 8 hours into testing runs (dev and test)
 episodes_dir = "data/episodes"      # what each investigation is allowed to see (labels never go here)
+monitor_file = "data/monitor/monitor.npz"  # what the monitor learned, saved once, so the server needn't fit it
 
 # Which recorded runs are used for what. Each range includes both ends.
 [splits]

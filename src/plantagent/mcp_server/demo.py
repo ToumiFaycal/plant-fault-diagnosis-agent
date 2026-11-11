@@ -2,7 +2,8 @@
 
 The demo is the client. It starts the server (`python -m plantagent.mcp_server --episode ...`),
 connects over stdio, lists the tools, calls each one, and shows one deliberate mistake coming back
-as an error the model could read.
+as an error the model could read. The server needs the saved monitor: run
+`python -m plantagent.monitor.saved` once first.
 
 Run it with:
     python -m plantagent.mcp_server.demo
@@ -51,6 +52,20 @@ async def talk_to_server(episode: str) -> None:
 
         future = await client.call_tool("get_trend", {"tag": "xmeas_9", "window_start": "47:00", "window_end": "48:00"})
         show('get_trend("xmeas_9", "47:00", "48:00"): a window entirely after now', future)
+
+        now_time = info.structured_content["now_time"]
+        status = await client.call_tool("get_monitor_status", {"window_start": "00:00", "window_end": now_time})
+        show(f'get_monitor_status("00:00", "{now_time}"): the whole episode', status)
+
+        # The way an investigation goes: which signals carry the alarm, then how far from normal they are.
+        top = await client.call_tool("top_contributors", {"window_start": hour_ago, "window_end": now_time,
+                                                          "k": 4, "statistic": "SPE"})
+        show(f'top_contributors("{hour_ago}", "{now_time}", k=4, statistic="SPE")', top)
+
+        tags = [contributor["tag"] for contributor in top.structured_content["contributors"]]
+        compared = await client.call_tool("compare_to_normal", {"tags": tags, "window_start": hour_ago,
+                                                                "window_end": now_time})
+        show(f'compare_to_normal({tags}, "{hour_ago}", "{now_time}"): the signals found just above', compared)
 
 
 def main() -> None:
