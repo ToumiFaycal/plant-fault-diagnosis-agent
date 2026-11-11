@@ -18,18 +18,10 @@ import numpy as np
 
 from plantagent.config import PROJECT_ROOT, load_config
 from plantagent.convert_data import runs_between
+from plantagent.fault_groups import fault_group
 from plantagent.monitor.alarms import alarm_run
 from plantagent.monitor.data import load_signals_by_run
 from plantagent.monitor.scores import fit_monitor
-
-HARD_FAULTS = {3, 9, 15}  # widely reported as nearly undetectable
-UNKNOWN_FAULTS = {16, 17, 18, 19, 20}  # not described in the original problem
-
-
-def fault_group(fault: int) -> str:
-    if fault in HARD_FAULTS:
-        return "hard"
-    return "unknown-type" if fault in UNKNOWN_FAULTS else "known"
 
 
 def false_alarms(monitor: dict, runs: dict, in_a_row: int) -> dict:

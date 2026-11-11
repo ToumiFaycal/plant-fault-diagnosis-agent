@@ -136,3 +136,15 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 | 6 | 0 of 50 | 0 of 10 | 0 of 100 | 81 of 100 | 48 min |
 
 **Choice: 3 in a row**, set in `config.toml`. It is the smallest number with no development fault run alarming before its fault, it keeps all detectable faults, and it reacts fastest. The price is an occasional false alarm on a healthy run (3 of 10 development runs over 48 hours). This choice used the development runs, never the test runs.
+
+## 2026-11-11: How a run becomes an investigation (an "episode")
+
+**What:** each development run becomes one episode for the agent: a random name (like `ep_3f9a1c2e`), a trigger message, and the plant's signals **up to "now" only**. The answers (fault, run, group) are written to a separate file, `episodes/labels_dev.jsonl`, that only the grader reads. The signal files are stored in `data/episodes/`, which holds no answer columns at all.
+
+**When "now" is:**
+- If the monitor alarms during the run (3 moments in a row above a limit): 1 hour after its first alarm. The message says when the alarm happened and what time it is now.
+- If it never alarms: an operator reports that the plant "looks off" at a random time 1 to 6 hours after 8:00, and "now" is 1 hour after the report. Normal and faulty runs get exactly the same rule, so the time doesn't give the answer away.
+
+**Measured on the 110 development runs:** 89 episodes start from an alarm, 21 from an operator's report. The 21 are the 7 normal runs that never alarm, all 10 runs of faults 3 and 9, and 4 of the 5 runs of fault 15. Three normal runs start from a false alarm (at 11:39, 25:00 and 42:12), which tests whether the agent can conclude "no fault". The latest first alarm is at sample 844, so "1 hour later" always fits inside the 48-hour runs.
+
+**Fixed for repeatability:** the names, the report times and the shuffled order all come from one seed (`[episodes] seed` in `config.toml`), so rebuilding gives exactly the same episodes. The list of development episodes is frozen once committed; any rebuild with different settings will be logged here.

@@ -6,6 +6,7 @@ raw_dir = "data/raw"              # the four downloaded .RData files
 processed_dir = "data/processed"  # the Parquet files made by convert_data
 first_faulty_sample_training = 21   # faults start 1 hour into training runs (checked in the data)
 first_faulty_sample_testing = 161   # and 8 hours into testing runs (dev and test)
+episodes_dir = "data/episodes"      # what each investigation is allowed to see (labels never go here)
 
 # Which recorded runs are used for what. Each range includes both ends.
 [splits]
@@ -24,6 +25,12 @@ test_pool_runs = { first = 201, last = 250 }  # kept apart for the final exam; h
 share_of_variation_to_keep = 0.90  # keep enough normal patterns to explain 90 % of normal variation
 alarm_percentile = 99              # alarm limit: only 1 % of healthy moments score above it
 alarm_after_consecutive = 3        # raise the alarm only after this many moments in a row above a limit
+
+# Episodes: each development (later test) run becomes one investigation for the agent.
+[episodes]
+seed = 2026                       # fixes the random episode names and operator report times
+investigate_after_minutes = 60    # "now" is this long after the first alarm, or after the operator's report
+operator_report_after_hours = { first = 1, last = 6 }  # no alarm: an operator reports 1 to 6 hours after 8:00
 
 # The language model, run on this computer by Ollama.
 [llm]
