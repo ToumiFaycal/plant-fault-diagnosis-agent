@@ -5,6 +5,7 @@ import numpy as np
 from plantagent.config import load_config
 from plantagent.convert_data import runs_between
 from plantagent.monitor.patterns import choose_number_of_patterns, fit_patterns
+from plantagent.monitor.scores import alarm_limit, spe_scores, t2_scores
 from plantagent.monitor.standardize import fit_normal_stats, standardize
 
 
@@ -61,3 +62,39 @@ def test_number_of_patterns_kept():
     assert choose_number_of_patterns(shares, 0.50) == 1  # 0.60 already reaches 50 %
     assert choose_number_of_patterns(shares, 0.90) == 3  # 0.60 + 0.25 = 0.85 isn't enough; + 0.10 = 0.95 is
     assert choose_number_of_patterns(shares, 0.99) == 4  # all four are needed
+
+
+def twin_patterns():
+    """The ways of moving of two made-up signals that always move together (like the two pressures)."""
+    random = np.random.default_rng(1)
+    first = random.normal(size=500)
+    second = first + 0.05 * random.normal(size=500)
+    Z = np.column_stack([first, second])
+    return fit_patterns(Z - Z.mean(axis=0))  # way 1: "both together"; way 2: "apart" (almost never)
+
+
+def test_a_moment_at_the_normal_average_is_not_strange():
+    patterns = twin_patterns()
+    at_average = np.array([[0.0, 0.0]])
+    assert np.allclose(t2_scores(at_average, patterns, kept=1), 0)
+    assert np.allclose(spe_scores(at_average, patterns, kept=1), 0)
+
+
+def test_both_far_up_together_is_a_strange_amount_not_a_strange_pattern():
+    patterns = twin_patterns()
+    both_up = np.array([[2.0, 2.0]])  # the usual way of moving, but far
+    assert t2_scores(both_up, patterns, kept=1)[0] > 1
+    assert spe_scores(both_up, patterns, kept=1)[0] < 0.1
+
+
+def test_moving_apart_is_a_strange_pattern_not_a_strange_amount():
+    patterns = twin_patterns()
+    apart = np.array([[2.0, -2.0]])  # one up, one down: the way a healthy pair never moves
+    assert spe_scores(apart, patterns, kept=1)[0] > 1
+    assert t2_scores(apart, patterns, kept=1)[0] < 0.1
+
+
+def test_alarm_limit_leaves_1_percent_of_healthy_scores_above_it():
+    healthy_scores = np.arange(1, 1001)  # 1, 2, ..., 1000
+    limit = alarm_limit(healthy_scores, 99)
+    assert np.mean(healthy_scores > limit) == 0.01  # exactly 10 of the 1000 are above

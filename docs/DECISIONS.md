@@ -109,4 +109,14 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 
 **Choice:** 90 %, the starting value in the plan, so **31 patterns out of 52**. It's set in `config.toml` and may be revisited once the monitor's false alarms and detection are measured.
 
-**The surprise:** a handful of patterns is not enough for this plant. Only 42 of the 1,326 pairs of signals are strongly linked in normal operation (correlation above 0.5 either way), and much of each sensor's normal wobble is its own random noise, shared with nothing else. The strongest links are what you'd expect physically, like reactor and separator pressure (+0.998) or a valve and the flow it sets.
+**The surprise (patterns):** a handful of patterns is not enough for this plant. Only 42 of the 1,326 pairs of signals are strongly linked in normal operation (correlation above 0.5 either way), and much of each sensor's normal wobble is its own random noise, shared with nothing else. The strongest links are what you'd expect physically, like reactor and separator pressure (+0.998) or a valve and the flow it sets.
+
+## 2026-11-10: The monitor's two strangeness scores and their alarm limits
+
+**What:** every moment now gets two scores. T² ("strange amount") says how far the plant goes along its 31 usual ways of moving, each measured in its own normal wobble. SPE ("strange pattern") says how much of the moment those 31 ways can't rebuild. Each score gets an alarm limit set on 25,000 healthy moments the monitor never learned from (calibration runs 101–150), placed so that only 1 % of them score above it.
+
+**Measured:**
+- Limits: **T² 51.6**, **SPE 11.5**.
+- Development run 1, normal operation: 1.2 % of moments above the T² limit and 0.6 % above the SPE limit before 8:00, 1.6 % and 1.5 % after. That's close to the 1 % chosen, and it means a monitor that alarms on a single moment would cry wolf around a dozen times in a 48-hour healthy run. Hence the next stage: alarm only when the scores stay above their limits for several moments in a row.
+- Development run 1 of fault 4: after 8:00, **99.8 %** of moments are above the SPE limit, but only 38.8 % above the T² limit. This fault shows up mainly as a strange pattern, not a strange amount (the cooling water valve moves while the temperature stays put).
+- Fault 3 changes the plant so little that its scores after 8:00 look like the normal run's (1.6 % and 1.5 % above the limits).
