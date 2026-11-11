@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-11",
+  "commit": "cd0cd9d",
+  "alarm_after_consecutive": 3,
+  "ways_kept": 31,
+  "t2_limit": 51.6,
+  "spe_limit": 11.5,
+  "calibration": {
+    "moments_in_alarm_percent": 0.09,
+    "runs_with_an_alarm": 10,
+    "runs": 50,
+    "separate_alarms": 11,
+    "hours": 1250.0
+  },
+  "normal_dev": {
+    "moments_in_alarm_percent": 0.05,
+    "runs_with_an_alarm": 3,
+    "runs": 10,
+    "separate_alarms": 3,
+    "hours": 480.0
+  },
+  "faults": {
+    "1": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 15.0
+    },
+    "2": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 33.0
+    },
+    "3": {
+      "group": "hard",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 0,
+      "median_delay_min": null
+    },
+    "4": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 9.0
+    },
+    "5": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 9.0
+    },
+    "6": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 9.0
+    },
+    "7": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 9.0
+    },
+    "8": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 57.0
+    },
+    "9": {
+      "group": "hard",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 0,
+      "median_delay_min": null
+    },
+    "10": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 93.0
+    },
+    "11": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 33.0
+    },
+    "12": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 18.0
+    },
+    "13": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 117.0
+    },
+    "14": {
+      "group": "known",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 9.0
+    },
+    "15": {
+      "group": "hard",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 1,
+      "median_delay_min": 219.0
+    },
+    "16": {
+      "group": "unknown-type",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 147.0
+    },
+    "17": {
+      "group": "unknown-type",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 105.0
+    },
+    "18": {
+      "group": "unknown-type",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 156.0
+    },
+    "19": {
+      "group": "unknown-type",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 159.0
+    },
+    "20": {
+      "group": "unknown-type",
+      "runs": 5,
+      "runs_alarming_before_fault": 0,
+      "runs_detected": 5,
+      "median_delay_min": 96.0
+    }
+  }
+}
