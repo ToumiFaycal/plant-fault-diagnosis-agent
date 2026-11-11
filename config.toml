@@ -32,6 +32,14 @@ seed = 2026                       # fixes the random episode names and operator 
 investigate_after_minutes = 60    # "now" is this long after the first alarm, or after the operator's report
 operator_report_after_hours = { first = 1, last = 6 }  # no alarm: an operator reports 1 to 6 hours after 8:00
 
+# Baseline B2: a classifier that learns to name faults from labelled training runs (no tools, no reasoning).
+[baseline]
+window_minutes = 60        # it looks at the last hour of the plant: 20 moments
+window_every_minutes = 30  # from each training run, one 1-hour window every 30 minutes
+trees = 100                # how many decision trees vote
+min_examples_per_leaf = 5  # each final answer in a tree must rest on at least 5 examples (keeps trees small)
+seed = 0                   # fixes the random parts of training, so it gives the same model every time
+
 # The language model, run on this computer by Ollama.
 [llm]
 model = "qwen3:8b"

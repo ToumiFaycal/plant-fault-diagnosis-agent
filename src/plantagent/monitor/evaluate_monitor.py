@@ -10,18 +10,17 @@ Run it once with:
     python -m plantagent.monitor.evaluate_monitor
 """
 
-import json
-import subprocess
 from datetime import date
 
 import numpy as np
 
-from plantagent.config import PROJECT_ROOT, load_config
+from plantagent.config import load_config
 from plantagent.convert_data import runs_between
 from plantagent.fault_groups import fault_group
 from plantagent.monitor.alarms import alarm_run
 from plantagent.monitor.data import load_signals_by_run
 from plantagent.monitor.scores import fit_monitor
+from plantagent.results_log import git_commit, save_results
 
 
 def false_alarms(monitor: dict, runs: dict, in_a_row: int) -> dict:
@@ -65,14 +64,6 @@ def detection(monitor: dict, runs: dict, in_a_row: int, first_faulty_sample: int
     }
 
 
-def git_commit() -> str:
-    commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
-                            cwd=PROJECT_ROOT).stdout.strip()
-    changed = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], capture_output=True,
-                             text=True, cwd=PROJECT_ROOT).stdout.strip()
-    return f"{commit} (with uncommitted changes)" if changed else commit
-
-
 def main() -> None:
     config = load_config()
     splits = config["splits"]
@@ -97,17 +88,7 @@ def main() -> None:
 
     report = make_report(results)
     print(report)
-    out_dir = PROJECT_ROOT / "results"
-    out_dir.mkdir(exist_ok=True)
-    (out_dir / "monitor_dev.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-    log = out_dir / "RESULTS.md"
-    if not log.exists():
-        log.write_text("# Results\n\nAn append-only log of measured numbers: date, data split, what was measured, "
-                       "the numbers, and the commit they came from. Every number here is written by a script.\n",
-                       encoding="utf-8")
-    with log.open("a", encoding="utf-8") as file:
-        file.write("\n" + report)
-    print(f"Saved results/monitor_dev.json and added the table to results/RESULTS.md")
+    save_results("monitor_dev.json", results, report)
 
 
 def make_report(results: dict) -> str:

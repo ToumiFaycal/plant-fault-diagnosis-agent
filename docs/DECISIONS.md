@@ -148,3 +148,29 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 **Measured on the 110 development runs:** 89 episodes start from an alarm, 21 from an operator's report. The 21 are the 7 normal runs that never alarm, all 10 runs of faults 3 and 9, and 4 of the 5 runs of fault 15. Three normal runs start from a false alarm (at 11:39, 25:00 and 42:12), which tests whether the agent can conclude "no fault". The latest first alarm is at sample 844, so "1 hour later" always fits inside the 48-hour runs.
 
 **Fixed for repeatability:** the names, the report times and the shuffled order all come from one seed (`[episodes] seed` in `config.toml`), so rebuilding gives exactly the same episodes. The list of development episodes is frozen once committed; any rebuild with different settings will be logged here.
+
+## 2026-11-11: Which signals carry an alarm (contributions)
+
+**What:** the monitor's two scores say *how* strange a moment is, not *which* signals are to blame. Each score is now split into 52 parts, one per signal, that add up exactly to the score:
+- **SPE:** a signal's part is its own squared leftover (what the healthy ways of moving can't rebuild).
+- **T²:** the moment's position along each kept way, measured in that way's own wobble, is turned back into the 52 signals and squared. This is the "complete decomposition" form named by Alcala and Qin (2011): its parts are never negative. Another common form (each signal's value times its share of the weighted score) also adds up to T², but on development run 1 of fault 4, **18.7 %** of its parts were negative, which makes no sense as a share of blame. We chose the form that is never negative. A test checks on made-up data that both kinds of parts add up to the scores.
+
+**Measured** on development run 1, over the hour from the first alarm (08:09) to one hour later, which is the hour an episode ends with:
+- Fault 4: SPE parts led by `xmv_10` (reactor cooling water valve) **44 %** and `xmeas_9` (reactor temperature) **39 %**; T² parts led by the same two (21 % and 19 %).
+- Fault 6: SPE parts led by `xmv_3` (A feed valve) **46 %** and `xmeas_1` (A feed flow) **43 %**: a valve and the flow it sets, no longer moving together.
+
+**Limit, seen in the data:** contributions show where the strangeness appears, not always where the fault started. For fault 5 (condenser cooling water), the condenser's cooling water valve (`xmv_11`) is not among the top 6 parts of either score; the largest SPE parts are spread over other signals (the biggest is 16 %). The agent must treat contributions as clues to check, not as the answer. These observations stay in this log: they are never added to the knowledge base the agent reads.
+
+## 2026-11-11: Baseline B2, a classifier that learns from labelled runs
+
+**What:** a random forest (scikit-learn, 100 trees) learns to name the fault from labelled examples, with no tools and no reasoning. It looks at one hour of the plant, summed up per signal by its average, its wobble (standard deviation) and its slope: 156 numbers. It learns from training runs 1–50 of the normal plant and of each of the 20 faults (21 answers, 0 to 20), one 1-hour window every 30 minutes: 49,450 windows, about one minute of training. In fault runs, only windows that start at or after the fault's first sample (21) are used, since the hour before is healthy. On each development episode it sees only the last hour before "now". The model is not saved: it is trained again each time from fixed settings and seed (`[baseline]` in `config.toml`).
+
+**Measured in a rehearsal** (same code and seed; the official numbers are those the script writes to `results/RESULTS.md`):
+- Known faults named exactly: **60 of 60**. Unknown-type faults (16–20): **25 of 25**, each named exactly, because it has seen 50 labelled runs of each.
+- Normal runs called "no fault": only **1 of 10**. Hard faults acceptable: 8 of 15.
+
+**Why it fails on healthy runs:** normal operation and faults 3, 9 and 15 look alike in the data, so on a healthy-looking hour the forest splits its votes almost evenly between these four answers (about 0.2–0.3 each) and must still pick one. On the normal runs its chosen answer had a median probability of only 0.29, against 0.85 on known faults: it is unsure, but a classifier always gives an answer.
+
+**Alternative measured, not used:** training with faults 3, 9 and 15 merged into "normal" gives 8 of 10 normal runs right and 13 of 15 hard runs answered "no fault", with known and unknown-type faults unchanged. We keep the plain version: merging would use our knowledge of which faults are hard to detect (the grading groups) to shape the training, and the plain version is the standard way such a classifier is built.
+
+**What this means for the comparison:** B2 sets a high bar on faults it has seen many labelled examples of, which a real plant rarely has, and it explains nothing. The agent's possible advantages are elsewhere: saying "no fault" or "inconclusive" when the data is ambiguous, and backing its answer with checked evidence.

@@ -24,6 +24,11 @@ The sources this project relies on, and what each one was used for.
 - [PCA for fault detection in Tennessee Eastman Process](https://bibmon.readthedocs.io/en/stable/tutorial_tep.html) (BibMon documentation). A clear table of the 41 measurements and 12 valves, with units and analyser timing, in the correct valve order, and a short description of the plant's units. A source for `tags.csv` and `process_overview.md`.
 - [FaultExplainer: Leveraging Large Language Models for Interpretable Fault Detection and Diagnosis](https://arxiv.org/abs/2412.14492) (Khan, Nahar, Chen, Constante Flores and Li, 2024) and its [code](https://github.com/li-group/FaultExplainer). The published work closest to this project: a language model explains faults of the same plant from a single prompt. Its prompt file (`backend/prompts.py`) holds a detailed description of the plant, used as a source for `process_overview.md`.
 
+## The monitor and the baseline
+
+- [Random forests](https://scikit-learn.org/stable/modules/ensemble.html#random-forests) (scikit-learn user guide) and the [`RandomForestClassifier` page](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html). What a random forest is (many decision trees grown on random parts of the examples, which vote) and its settings; the basis of baseline B2 in `src/plantagent/baseline/classifier.py`.
+- [Analysis and generalization of fault diagnosis methods for process monitoring](https://doi.org/10.1016/j.jprocont.2010.10.005) (Alcala and Qin, 2011, Journal of Process Control). Gives the name "complete decomposition" to the way we split T² into one non-negative part per signal (`src/plantagent/monitor/contributions.py`). Only the abstract was read; that the parts add up to T² is checked by our own test.
+
 ## The plant data
 
 - [Additional Tennessee Eastman Process Simulation Data for Anomaly Detection Evaluation](https://doi.org/10.7910/DVN/6C3JR1) (Rieth, Amsel, Tran and Cook, 2017, Harvard Dataverse). The recorded plant runs this project works on: normal runs and runs with each of 20 faults. Used to download the four data files and to check the facts we rely on (one sample every 3 minutes, run lengths, when each fault starts).

@@ -5,6 +5,8 @@ import numpy as np
 from plantagent.config import load_config
 from plantagent.convert_data import runs_between
 from plantagent.monitor.alarms import consecutive_alarm
+from plantagent.monitor.contributions import spe_contributions, t2_contributions, top_contributors
+from plantagent.monitor.data import SIGNALS
 from plantagent.monitor.patterns import choose_number_of_patterns, fit_patterns
 from plantagent.monitor.scores import alarm_limit, spe_scores, t2_scores
 from plantagent.monitor.standardize import fit_normal_stats, standardize
@@ -111,3 +113,48 @@ def test_alarm_only_after_enough_moments_in_a_row():
 def test_a_streak_broken_by_one_normal_moment_starts_again():
     above = np.array([True, True, False, True, True])
     assert not consecutive_alarm(above, 3).any()  # never 3 in a row
+
+
+# --- Contributions: each signal's part of a score ---
+
+def twins_and_loner_patterns():
+    """Three made-up signals: the first two always move together (twins), the third on its own.
+    Kept ways: "twins together" and "the loner"; left out: "twins apart" (almost never happens)."""
+    random = np.random.default_rng(2)
+    first = random.normal(size=1000)
+    second = first + 0.05 * random.normal(size=1000)
+    loner = random.normal(size=1000)
+    Z = np.column_stack([first, second, loner])
+    return fit_patterns(Z - Z.mean(axis=0))
+
+
+def test_contributions_add_up_to_the_scores():
+    patterns = twins_and_loner_patterns()
+    moments = np.random.default_rng(3).normal(size=(5, 3)) * 3  # 5 random moments
+    assert spe_contributions(moments, patterns, kept=2).shape == (5, 3)  # one part per moment and signal
+    assert np.allclose(spe_contributions(moments, patterns, kept=2).sum(axis=1), spe_scores(moments, patterns, kept=2))
+    assert np.allclose(t2_contributions(moments, patterns, kept=2).sum(axis=1), t2_scores(moments, patterns, kept=2))
+    assert (t2_contributions(moments, patterns, kept=2) >= 0).all()  # no negative parts
+
+
+def test_a_signal_far_out_on_its_own_carries_the_t2():
+    patterns = twins_and_loner_patterns()
+    loner_far_up = np.array([[0.0, 0.0, 4.0]])
+    parts = t2_contributions(loner_far_up, patterns, kept=2)[0]
+    assert parts[2] / parts.sum() > 0.95  # the loner carries almost all of T²
+
+
+def test_twins_moving_apart_share_the_spe():
+    patterns = twins_and_loner_patterns()
+    apart = np.array([[2.0, -2.0, 0.0]])  # the twins break their pattern; the loner is calm
+    shares = spe_contributions(apart, patterns, kept=2)[0] / spe_scores(apart, patterns, kept=2)[0]
+    assert np.allclose(shares, [0.5, 0.5, 0.0], atol=0.05)  # the blame is shared by the two twins
+
+
+def test_top_contributors_are_ranked_by_their_average_share():
+    parts = np.zeros((2, len(SIGNALS)))
+    parts[:, SIGNALS.index("xmeas_9")] = [1.0, 1.0]  # average 1
+    parts[:, SIGNALS.index("xmv_10")] = [3.0, 5.0]  # average 4
+    top = top_contributors(parts, k=2)
+    assert [tag for tag, _ in top] == ["xmv_10", "xmeas_9"]  # biggest first
+    assert np.allclose([share for _, share in top], [0.8, 0.2])  # 4 of 5 and 1 of 5
