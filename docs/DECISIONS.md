@@ -225,3 +225,26 @@ So 1.3 GB of downloads became about 200 MB of Parquet files: we keep only the ru
 **One query that shows the limits:** "reactor cooling water" puts the condenser section first (0.53), just ahead of the reactor section (0.52) and fault 4 (0.49): both units use cooling water. All three are returned, so the agent gets the right sections, but not always in the best order.
 
 **Still to measure (step 8):** the agent's language model (`qwen3:8b`, 7.8 GB with our context size) and `embeddinggemma` (0.7 GB) both run in Ollama, on an 8 GB graphics card. Whether Ollama keeps both loaded or swaps them on every search, which would slow each search down, will be measured during the first agent runs.
+
+## 2026-11-11: The diagnosis form and the fact-checker
+
+**What:** the agent's final answer is a form with fixed boxes (`Diagnosis`, in `src/plantagent/agent/diagnosis.py`), and a fact-checker (`src/plantagent/agent/verifier.py`) checks every piece of evidence in it against the tool result it cites. Neither needs the language model, so both are tested on made-up investigations; one test also runs the server over a made-up episode, so the checker reads the field names the tools really send.
+
+**The form, and the choices in it:**
+- **Boxes:** the evidence, the key signals, the affected unit, the status (`no_fault`, `fault` or `inconclusive`), the fault number (1 to 15, or empty), up to 3 ranked candidates, the confidence (low, medium, high), and up to 3 checks an operator could make on site.
+- **Only real names are accepted.** Signals must be one of the 52 tags, the unit one of the 8 process units that `list_tags` uses, and fault numbers 1 to 15. The form's schema lists these allowed values; in step 8.2 it will be handed to Ollama, which uses it to shape the model's answer, and Pydantic rejects anything else afterwards.
+- **Evidence first.** The boxes are filled in order, so the form asks for the facts before the conclusion, like a detective listing the clues before naming the culprit. Whether this order matters for a small model has not been measured.
+- **Each piece of evidence has its own box for a document section.** The plan listed four fields per piece of evidence (call_id, tag, claim, detail). A section ID such as `fault_catalogue#fault-4` is not a signal tag, so it gets its own `section_id` box; this way the tag box can be limited to the 52 real tags.
+
+**The checks**, for each piece of evidence:
+- the cited `call_id` was really received in this investigation;
+- it comes from the right tool for the claim (`above_normal` and `below_normal` from `compare_to_normal`, `top_contributor` from `top_contributors`, `monitor_alarm` from `get_monitor_status`, `doc_section` from `search_docs`);
+- the result supports the claim: the tag is in it, its z-score is at least +2 (above) or at most −2 (below), the section was returned, the monitor did alarm in that window.
+
+And for the whole report: a `fault` diagnosis needs at least one piece of evidence. Without this rule, the easiest way to pass every check would be to cite nothing. A `no_fault` report may have none, since none of the five claims describes a healthy plant.
+
+**Problems are written for the model to read.** Each one says what is wrong and how to fix it ("no tool result has call_id c9: cite only call_ids you received"; "xmeas_38 has z_score 0.0206313 in result c3, so it is not above normal (that needs z_score >= 2)"), because the agent gets one chance to correct its report (step 8.3).
+
+**Seen on a real episode** (`python -m plantagent.agent.verifier`, development run 1 of fault 5): a hand-written report with 6 pieces of evidence, 2 wrong on purpose. The checker kept the 4 right ones and caught both mistakes: `xmeas_38` claimed as above normal (z = 0.02, although it carries 15 % of SPE) and a receipt `c9` that was never issued.
+
+**Not checked (yet):** numbers written inside the free-text `detail` sentences. Whether that's needed will be decided after reading real reports in step 8.3.
