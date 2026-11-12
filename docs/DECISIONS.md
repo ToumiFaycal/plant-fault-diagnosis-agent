@@ -308,3 +308,33 @@ Faycal's own run of the same trial, from a freshly loaded model and in the same 
 **Faycal's run** (commit `0bdb30d`, traces in `results/traces/2026-11-12_160919/`) **matched the rehearsal exactly** in all 5 episodes: the same tool requests, the same reports, the same fact-checks; only the timings differed (60.6 to 130.2 s per episode). So the agent repeats itself when it starts from the same point (a freshly loaded model) and runs the same episodes in the same order. The fault 5 episode's answer depends on what ran before it in the same session. That supports the guess above, though the exact cause inside Ollama isn't confirmed. A consequence for the evaluation: repeating a run 3 times in the same order would give the same results 3 times and say nothing about the spread. How the repeats should differ (for example, a different episode order each time) will be decided in step 9.
 
 **Nothing else changed before that run,** so the two runs can be compared. Then the instructions may change, but only about *how* to investigate and report (for example: compare several contributors to normal; a single moment above a limit isn't an alarm; a fault that fits no catalogue entry is reported without a number). Never which signals go with which fault.
+
+
+## 2026-11-12: Clearer instructions on how to investigate and report (version 2)
+
+**What changed,** based on the mistakes of the first trial, and only about *how* to work and report (nothing says which signals go with which fault):
+- **Investigate:** after the monitor's status and top contributors, compare the top contributors to normal (`compare_to_normal` takes several at once), because a big contributor is not always far from normal.
+- **What an alarm is:** the monitor alarms only after 3 moments in a row above a limit; in a status result, `first_alarm_time` gives the alarm, and if it's null there was none.
+- **The four conclusions:** no fault (no alarm and no signal far from normal); a catalogue fault; a fault that fits none of faults 1 to 15 (reported without a number); inconclusive. High confidence only when several pieces of evidence agree and one fault fits clearly better than the others.
+- **The report request now lists which result each kind of claim needs** (the checker's rules, stated openly), and the checker's message for a false alarm claim now says why.
+- A new test makes sure the agent's document search can only read the two documents in `knowledge/`. This file names the true faults of development episodes, so the agent must never be able to read it.
+
+**The same 5 episodes again** (rehearsal copy, freshly loaded model):
+
+| Episode | The truth | Before | After |
+|---|---|---|---|
+| `ep_da12f9aa` | normal (operator) | inconclusive | **no fault** (right) |
+| `ep_2a699431` | fault 1 | fault 7, high | fault 7, high (still a confident error) |
+| `ep_da9277da` | fault 3 (hard, operator) | inconclusive, but verification_failed | inconclusive, **fixed** (acceptable) |
+| `ep_d9c06aa9` | fault 16 (unknown type) | inconclusive | inconclusive |
+| `ep_f6f8d79c` | fault 5 | fault 1, medium | fault 1, medium |
+
+- **Right or acceptable: 0 of 5 before, 2 of 5 after.** Five episodes are far too few to call this an improvement in general; the full development evaluation (step 9) will tell.
+- **The investigations changed as intended:** the agent compared 5 top contributors to normal in every episode (before: 0, 5, 5, 1 and 1 signals).
+- **Two kinds of mistakes disappeared:** no more false "the monitor alarmed" claims, and no more evidence citing the wrong tool. Before, the first reports had 4 such failures, and 1 more survived the second chance; after, there were none.
+- **One kind remains:** "above normal" or "below normal" for a signal whose z-score was between −0.7 and +1.0 (8 of 38 pieces of evidence, in 3 episodes). The second chance removed all of them: outcomes 2 passed and 3 fixed, none verification_failed (before: 2, 2 and 1).
+- **Still wrong:** in the fault 5 episode, the agent now saw the separator temperature 4.75 wobbles above normal (z = +4.75, cited as evidence), but still chose fault 1, a stream-4 fault, from the top contributor. Linking a warmer separator to the condenser that cools its inlet is reasoning about the process. A general rule can't teach that without hinting at answers.
+- **A new problem:** two investigations used all 12 rounds, asking for one tool per round (8 document searches in a row in one of them) instead of several per round. The report is still written after round 12.
+- **Size and time:** the largest conversation grew to 8,915 tokens, more than 8,192, which confirms the 16,384 limit. 72.7 to 128.4 s per episode (median 96.9 s, 509.5 s for the five).
+
+**Decision: no more changes to the instructions based on these 5 episodes.** More rounds of tuning on 5 episodes would mostly fit these 5. The remaining failures seem to come from reasoning about the process rather than from a missing rule about how to work. The full development evaluation will show what's systematic, and the test episodes stay untouched.

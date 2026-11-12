@@ -96,7 +96,8 @@ def check_evidence(item: Evidence, calls: dict[str, ToolCall]) -> list[str]:
 
     if item.claim == "monitor_alarm":
         if call.result["first_alarm_time"] is None:
-            return [f"result {item.call_id} shows no alarm in its window."]
+            return [f"result {item.call_id} shows no alarm in its window: its first_alarm_time is null (a score "
+                    f"above its limit for a moment is not an alarm)."]
         return []
 
     if item.claim == "doc_section":

@@ -5,11 +5,16 @@ fact-checker found problems, the request to correct the report (its one second c
 The instructions describe the job and the rules, not the answers: nothing here says which
 signals go with which fault. The fault catalogue is included because the report must name a
 catalogue number, and it describes causes only (see knowledge/fault_catalogue.md).
+
+Version 2 (step 8.3): after the first trial, the instructions say more about *how* to work:
+compare the top contributors to normal, what counts as an alarm, the four possible conclusions,
+when to be confident, and which result each kind of evidence needs (docs/DECISIONS.md).
 """
 
 import json
 
 from plantagent.agent.diagnosis import Diagnosis
+from plantagent.config import load_config
 from plantagent.docsearch import knowledge_sections
 
 
@@ -20,18 +25,33 @@ def fault_catalogue() -> str:
 
 
 def system_prompt() -> str:
+    in_a_row = load_config()["monitor"]["alarm_after_consecutive"]
     return f"""You investigate a problem report in a simulated chemical plant, the Tennessee Eastman process. \
 You can see the plant only through your tools, and you cannot change anything in it.
 
 How to work:
 - Start with get_episode_info.
-- Find out what the plant monitor saw (get_monitor_status, top_contributors), then check the signals that \
-matter (compare_to_normal, get_trend). Use list_tags to find signal names and search_docs to read how the \
-plant works.
+- Find out what the plant monitor saw: get_monitor_status, then top_contributors.
+- Then compare the top contributors to normal with compare_to_normal (it takes several tags at once). A big \
+contributor is not always far from normal: only compare_to_normal tells you whether a signal is above or below \
+normal.
+- Use get_trend to see how a signal moved, list_tags to find signal names, and search_docs to read how the \
+plant works and what each fault changes.
 - You may call several tools at each turn. When you have enough evidence, reply without calling any tool: \
 you will then be asked for your final report.
-- Your conclusion can be that the plant is normal, that it has a fault, or that the data does not allow a \
-decision.
+
+How to read the monitor:
+- The monitor raises an alarm only after {in_a_row} moments in a row above a limit. In a get_monitor_status \
+result, first_alarm_time gives the alarm. If it is null, there was no alarm in that window, even if a score \
+went above its limit for a moment.
+
+How to conclude:
+- no_fault: the monitor shows no alarm and no signal is far from normal.
+- fault with a fault_id: the evidence points to one fault of the catalogue below.
+- fault with fault_id null: the plant is clearly abnormal, but none of faults 1 to 15 fits.
+- inconclusive: something may be wrong, but the evidence does not allow a decision.
+- Use high confidence only when several pieces of evidence agree and one catalogue fault fits clearly better \
+than the others.
 
 Rules:
 - Times are HH:MM counted from the start of the run. Nothing after "now" exists.
@@ -51,7 +71,11 @@ def report_request() -> str:
 {schema}
 
 Each piece of evidence must cite the call_id of a tool result from this conversation, and is checked against \
-that result."""
+that result. Which result each claim needs:
+- above_normal / below_normal: a compare_to_normal result in which that tag's direction is "up" / "down".
+- top_contributor: a top_contributors result that lists that tag.
+- monitor_alarm: a get_monitor_status result whose first_alarm_time is not null.
+- doc_section: a search_docs result that returned that section."""
 
 
 def fix_request(problems: list[str]) -> str:

@@ -3,12 +3,14 @@ made-up episode (no language model and no real data needed)."""
 
 import asyncio
 import json
+import typing
 
 from mcp import Client
 from ollama import ChatResponse, Message
 
+from plantagent.agent.diagnosis import Claim
 from plantagent.agent.loop import investigate, tools_for_ollama, write_report
-from plantagent.agent.prompts import fault_catalogue, system_prompt
+from plantagent.agent.prompts import fault_catalogue, report_request, system_prompt
 from plantagent.config import PROJECT_ROOT
 from test_mcp_server import made_up_server  # the server over the made-up episode (now = 05:00)
 
@@ -142,6 +144,12 @@ def test_the_instructions_include_the_fault_catalogue_without_its_sources():
         assert f"## Fault {fault}:" in catalogue
     assert "Sources" not in catalogue and "temexd" not in catalogue
     assert catalogue in system_prompt()
+
+
+def test_the_report_request_says_what_each_claim_needs():
+    request = report_request()
+    for claim in typing.get_args(Claim):  # every kind of evidence the form allows
+        assert f"- {claim}" in request or f"/ {claim}" in request, f"the report request never explains {claim}"
 
 
 def test_the_agent_code_never_mentions_the_answers():

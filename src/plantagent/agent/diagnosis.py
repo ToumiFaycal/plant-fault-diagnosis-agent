@@ -30,8 +30,9 @@ class Evidence(BaseModel):
     call_id: str = Field(pattern=r"^c\d+$", description="The call_id of the tool result this fact comes from, like 'c3'.")
     claim: Claim = Field(description=(
         "What the cited result shows. above_normal / below_normal: a compare_to_normal result gives this tag "
-        "z_score >= 2 / <= -2. top_contributor: a top_contributors result lists this tag. monitor_alarm: a "
-        "get_monitor_status result shows an alarm. doc_section: a search_docs result returned this section."))
+        "direction 'up' / 'down' (z_score >= 2 / <= -2). top_contributor: a top_contributors result lists this "
+        "tag. monitor_alarm: a get_monitor_status result whose first_alarm_time is not null. doc_section: a "
+        "search_docs result returned this section."))
     tag: Tag | None = Field(description="The signal, like 'xmeas_9', for above_normal, below_normal and "
                                         "top_contributor. null for monitor_alarm and doc_section.")
     section_id: str | None = Field(description="For doc_section only: the section_id, like "
@@ -47,8 +48,8 @@ class Diagnosis(BaseModel):
     affected_unit: ProcessUnit | None = Field(description="The part of the plant where the problem seems to "
                                                           "start, or null if there is no fault or it is unclear.")
     status: Literal["no_fault", "fault", "inconclusive"] = Field(description=(
-        "no_fault: the plant behaves normally. fault: something is wrong. inconclusive: the data does not "
-        "allow a decision."))
+        "no_fault: the plant behaves normally. fault: something is wrong (with fault_id null if none of faults "
+        "1 to 15 fits). inconclusive: the data does not allow a decision."))
     fault_id: FaultId | None = Field(description=(
         "The catalogue number (1 to 15) of the most likely fault. null if status is not 'fault', or if the "
         "fault matches none of faults 1 to 15."))
