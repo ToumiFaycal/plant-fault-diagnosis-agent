@@ -54,6 +54,9 @@ think = false     # Qwen3's slower "thinking mode"; whether it helps is measured
 [agent]
 max_steps = 12                  # most rounds of "the model asks, the tools answer" before it must write its report
 trace_dir = "results/traces"    # one file per episode: every model call and tool call, with times and tokens
+# A first trial on 5 development episodes (python -m plantagent.agent --trial): run 1 of the first
+# fault of each grading group and of the normal runs, plus the first episode we ran (see docs/DECISIONS.md).
+trial_episodes = ["ep_da12f9aa", "ep_2a699431", "ep_da9277da", "ep_d9c06aa9", "ep_f6f8d79c"]
 
 # Searching the plant's reference documents (knowledge/) by meaning.
 [docs]

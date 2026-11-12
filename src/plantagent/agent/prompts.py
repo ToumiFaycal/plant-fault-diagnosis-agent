@@ -1,5 +1,6 @@
-"""The two texts the model reads besides the tool results: its instructions at the start of an
-investigation (the "system prompt"), and the request for the final report at the end.
+"""The texts the model reads besides the tool results: its instructions at the start of an
+investigation (the "system prompt"), the request for the final report at the end, and, if the
+fact-checker found problems, the request to correct the report (its one second chance).
 
 The instructions describe the job and the rules, not the answers: nothing here says which
 signals go with which fault. The fault catalogue is included because the report must name a
@@ -51,3 +52,16 @@ def report_request() -> str:
 
 Each piece of evidence must cite the call_id of a tool result from this conversation, and is checked against \
 that result."""
+
+
+def fix_request(problems: list[str]) -> str:
+    """The second chance: the fact-checker's problems, and the request for a corrected report."""
+    listed = "\n".join(f"- {problem}" for problem in problems)
+    return f"""A fact-checker compared your report with the tool results it cites and found these problems:
+
+{listed}
+
+Write your whole report again, as JSON following the same schema. For each problem, either cite a tool \
+result that really supports the claim, or remove that piece of evidence. You cannot call tools any more: use \
+only the results already in this conversation. If the evidence that remains no longer supports your \
+conclusion, change the conclusion or lower your confidence."""

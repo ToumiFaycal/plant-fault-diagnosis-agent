@@ -114,14 +114,17 @@ async def investigate(client: Client, chat: Chat, trigger_message: str, max_step
     return investigation
 
 
-async def write_report(chat: Chat, investigation: Investigation) -> Diagnosis | None:
-    """Ask for the final report, shaped by the Diagnosis form. None if it doesn't fit the form."""
-    investigation.messages.append({"role": "user", "content": report_request()})
+async def write_report(chat: Chat, investigation: Investigation, request: str | None = None) -> Diagnosis | None:
+    """Ask for the final report, shaped by the Diagnosis form. None if it doesn't fit the form.
+    `request` is the message that asks for it: the usual report request, or the fact-checker's
+    problems for a corrected report (see second_chance.py)."""
+    attempt = 1 + sum(event["event"] == "report" for event in investigation.trace)  # 2 = the second chance
+    investigation.messages.append({"role": "user", "content": request or report_request()})
     started = time.perf_counter()
     reply = await chat(investigation.messages, format=Diagnosis.model_json_schema())  # no tools: report only
     investigation.messages.append(reply.message)
     investigation.model_calls += 1
-    event = {"event": "report", "latency_s": round(time.perf_counter() - started, 2),
+    event = {"event": "report", "attempt": attempt, "latency_s": round(time.perf_counter() - started, 2),
              "load_s": round((reply.load_duration or 0) / 1e9, 2),
              "prompt_tokens": reply.prompt_eval_count, "output_tokens": reply.eval_count,
              "report": reply.message.content}

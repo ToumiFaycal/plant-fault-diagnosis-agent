@@ -266,6 +266,43 @@ And for the whole report: a `fault` diagnosis needs at least one piece of eviden
 - **What it did:** the episode information, the monitor status over the last hour, the top 5 SPE contributors, the feed tags, the comparison to normal of `xmeas_4` (A and C feed flow, z = −3.08, the top contributor), its trend, and a document search for "A and C feed flow (stream 4)". Then it stopped by itself.
 - **What it answered:** fault 1, confidence **high**, with fault 7 second, both of them faults of feed stream 4. **Wrong: the episode is fault 5** (condenser cooling water inlet temperature). It followed the single largest contributor, which carries only 16 % of SPE (step 7.2 showed that this fault's contributions are spread out), and never compared the other contributors to normal: the separator temperature was 5 wobbles above normal in the same hour. A confident error, the kind the grading counts separately.
 - **The fact-checker:** 5 of 6 pieces of evidence held, including two catalogue sections the search had really returned. One failed: the model called `xmeas_4` a "top contributor" while citing its `get_trend` result instead of the `top_contributors` result. The model also wrote numbers in its sentences (z = −3.07692, flow 9.232 to 8.9229); they match the results, but nothing checks them yet.
-- **Run again with the committed code** (commit `382ff01`, trace in `results/traces/2026-11-12_142223/`): the same tool calls, the same report and the same fact-check result. A program compared the two traces: apart from the timings, they are identical. That's the point of fixing the temperature at 0 and the seed: a change in results comes from a change we made, not from chance. It took 99 s this time; loading Qwen3 took 9 s instead of 25 s.
+- **Run again with the committed code** (commit `382ff01`, trace in `results/traces/2026-11-12_142223/`): the same tool calls, the same report and the same fact-check result. A program compared the two traces: apart from the timings, they are identical. That's what fixing the temperature at 0 and the seed is meant to achieve: a change in results should come from a change we made, not from chance. (The next entry shows this holds only partly.) It took 99 s this time; loading Qwen3 took 9 s instead of 25 s.
 
 **What we'll do next (step 8.3):** give the model its one chance to fix failed evidence, run 5 development episodes, and look at how it investigates before changing anything. Any change to the instructions will be about *how* to investigate (for example, check several contributors before concluding), never about which signals go with which fault. Development episodes are for exactly this; the test episodes stay untouched.
+
+
+## 2026-11-12: One chance to correct the report, and a first trial on 5 episodes
+
+**What:** when the fact-checker finds problems in the report, the model now gets the list of problems and one chance to hand in a corrected report (`src/plantagent/agent/second_chance.py`). It can't call tools any more: it can only cite a better result it already has, or remove the claim. The corrected report is checked too. Each episode ends with one of three outcomes: **passed** (the first report held), **fixed** (the corrected one held) or **verification_failed** (it still didn't hold; the evaluation will count it as a failure). A report that doesn't fit the Diagnosis form gets the same second chance, with one problem saying so.
+
+**Why only one chance:** each extra report costs 20 to 55 s, and if the exact list of problems isn't enough for the model to fix them, more rounds would mostly hide the weakness. "Passed" and "fixed" are counted separately, so the results show how much the second chance helps.
+
+**The trial episodes,** chosen by a fixed rule so that we couldn't pick easy ones: development run 1 of the first fault of each grading group (fault 1 known, fault 3 hard, fault 16 unknown type), normal run 1, and the fault 5 episode of the first investigation. That covers all four grading groups and both triggers. They're listed in `config.toml` and run with `python -m plantagent.agent --trial`.
+
+**First trial** (in a rehearsal copy of the same code; the official run follows):
+
+| Episode | The truth | Trigger | The agent's answer | Fact-check |
+|---|---|---|---|---|
+| `ep_da12f9aa` | normal (run 1) | operator | inconclusive, medium confidence | 2 of 4 failed → **fixed** |
+| `ep_2a699431` | fault 1 | alarm | **fault 7, high confidence** | passed |
+| `ep_da9277da` | fault 3 (hard) | operator | inconclusive, low | 3 of 8 failed, then 1 of 6 → **verification_failed** |
+| `ep_d9c06aa9` | fault 16 (unknown type) | alarm | inconclusive, low | 2 of 8 failed → **fixed** |
+| `ep_f6f8d79c` | fault 5 | alarm | fault 1, medium | passed |
+
+- **No episode got the right answer.** By the grading rules: the normal run should be "no fault"; fault 1 became a confident error (fault 7, also a feed-stream-4 fault); the hard fault 3 gave an acceptable "inconclusive" but failed the check; fault 16 should be "a fault not in the catalogue"; fault 5 became fault 1 again, with medium confidence this time. Five episodes are too few for a rate; they're for seeing how it fails.
+- **The second chance fixed 2 of 3 failing reports, by removing evidence, not by finding better evidence:** 4 pieces became 2, and 8 became 6.
+- **The same three mistakes kept coming back:**
+  - claiming "the monitor alarmed" from a status result that shows no alarm: a single moment above a limit isn't an alarm (that needs 3 in a row). This happened in both operator episodes, and survived the second chance once;
+  - claiming "top contributor" while citing a different tool (`list_tags`, `get_trend`);
+  - claiming a top contributor was "above normal" when its z-score was near 0. Step 7.2 showed a big contributor isn't always far from normal.
+- **Shallow investigations:** 4 to 9 tool calls. In 3 of 5 episodes it compared only one signal, or none, to normal. It often searched the documents with a signal's name.
+- **Time:** 62 to 137 s per episode (median 103 s, 508 s for the five). Each report took 18 to 55 s; a second chance added 18 to 45 s.
+- **Size:** the largest conversation was 7,540 tokens. A smaller limit of 8,192 (which would fit entirely on the graphics card) would leave almost no room, so `num_ctx` stays at 16,384.
+
+**A surprise: the same question didn't give the same answer.** The fault 5 episode ran last in the trial. Up to step 5 its conversation was identical to the first investigation's, token for token (3,688 tokens). Yet this time the model asked for `search_docs` where it had asked for `compare_to_normal`. From there the investigation went differently, and the report changed: fault 1 with medium confidence, and all evidence held. The two earlier runs that matched exactly both started with a freshly loaded model; this one came after four other investigations. Our guess, not confirmed: Ollama reuses the parts of the conversation it has already computed, so the order of the arithmetic changes, the last decimals differ, and a close choice between two tools can flip. So temperature 0 and a fixed seed don't guarantee that an episode always gets the same answer. What this means for us:
+- the 3 repeats planned for the evaluation are needed, and their spread must be reported;
+- one run of one episode can't show whether a change helped.
+
+Faycal's own run of the same trial, from a freshly loaded model and in the same order, will tell us more: if it matches this one exactly, the answer depends on what ran before; if not, it's less predictable than that.
+
+**Nothing else changed before that run,** so the two runs can be compared. Then the instructions may change, but only about *how* to investigate and report (for example: compare several contributors to normal; a single moment above a limit isn't an alarm; a fault that fits no catalogue entry is reported without a number). Never which signals go with which fault.
