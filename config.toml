@@ -50,6 +50,11 @@ temperature = 0   # 0 = always pick the most likely next word, so answers repeat
 seed = 42         # fixes the randomness that remains
 think = false     # Qwen3's slower "thinking mode"; whether it helps is measured later
 
+# The agent: Qwen3 investigating one episode through the plant-historian tools.
+[agent]
+max_steps = 12                  # most rounds of "the model asks, the tools answer" before it must write its report
+trace_dir = "results/traces"    # one file per episode: every model call and tool call, with times and tokens
+
 # Searching the plant's reference documents (knowledge/) by meaning.
 [docs]
 embedding_model = "embeddinggemma"  # turns a text into 768 numbers that capture its meaning (run by Ollama)
