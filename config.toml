@@ -20,7 +20,11 @@ baseline_runs = { first = 1, last = 50 }                # runs of every fault (a
 # Testing runs (48 hours each)
 dev_normal_runs = { first = 1, last = 10 }    # normal runs we develop and debug on
 dev_fault_runs = { first = 1, last = 5 }      # runs of each fault we develop and debug on
-test_pool_runs = { first = 201, last = 250 }  # kept apart for the final exam; how many we use is decided later
+test_pool_runs = { first = 201, last = 250 }  # kept apart for the final exam (the runs converted from the raw files)
+# The final exam, chosen on 2026-11-12 before anything was run on it: the same shape as the development
+# episodes (110), about 3 hours for one pass of the agent at about 100 seconds per episode.
+test_normal_runs = { first = 201, last = 210 }
+test_fault_runs = { first = 201, last = 205 }
 
 # The monitor (the plant's smoke detector).
 [monitor]
@@ -28,9 +32,10 @@ share_of_variation_to_keep = 0.90  # keep enough normal patterns to explain 90 %
 alarm_percentile = 99              # alarm limit: only 1 % of healthy moments score above it
 alarm_after_consecutive = 3        # raise the alarm only after this many moments in a row above a limit
 
-# Episodes: each development (later test) run becomes one investigation for the agent.
+# Episodes: each development or test run becomes one investigation for the agent.
 [episodes]
-seed = 2026                       # fixes the random episode names and operator report times
+seed = 2026                       # fixes the random episode names and operator report times (development)
+test_seed = 2027                  # the same for the test episodes (a different seed, so names never repeat)
 investigate_after_minutes = 60    # "now" is this long after the first alarm, or after the operator's report
 operator_report_after_hours = { first = 1, last = 6 }  # no alarm: an operator reports 1 to 6 hours after 8:00
 
@@ -55,11 +60,11 @@ think = false     # Qwen3's slower "thinking mode"; whether it helps is measured
 max_steps = 12                  # most rounds of "the model asks, the tools answer" before it must write its report
 trace_dir = "results/traces"    # one file per episode: every model call and tool call, with times and tokens
 # A first trial on 5 development episodes (python -m plantagent.agent --trial): run 1 of the first
-# fault of each grading group and of the normal runs, plus the first episode we ran (see docs/DECISIONS.md).
+# fault of each grading group and of the normal runs, plus the first episode we ran.
 trial_episodes = ["ep_da12f9aa", "ep_2a699431", "ep_da9277da", "ep_d9c06aa9", "ep_f6f8d79c"]
 
 # Searching the plant's reference documents (knowledge/) by meaning.
 [docs]
 embedding_model = "embeddinggemma"  # turns a text into 768 numbers that capture its meaning (run by Ollama)
 results = 3      # at most this many sections per search
-cutoff = 0.35    # sections less similar than this are left out (chosen from test questions; see docs/DECISIONS.md)
+cutoff = 0.35    # sections less similar than this are left out (chosen from 18 hand-written test questions)
