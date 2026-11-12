@@ -8,7 +8,7 @@ catalogue number, and it describes causes only (see knowledge/fault_catalogue.md
 
 Version 2 (step 8.3): after the first trial, the instructions say more about *how* to work:
 compare the top contributors to normal, what counts as an alarm, the four possible conclusions,
-when to be confident, and which result each kind of evidence needs (docs/DECISIONS.md).
+when to be confident, and which result each kind of evidence needs.
 """
 
 import json

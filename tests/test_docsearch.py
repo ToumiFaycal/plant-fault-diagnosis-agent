@@ -56,7 +56,7 @@ def test_the_real_documents_have_one_section_per_catalogue_fault():
 
 
 def test_the_agent_can_only_search_the_two_knowledge_documents():
-    # docs/DECISIONS.md, the README and the results name the true faults of development episodes:
+    # The results and the project's notes name the true faults of development episodes:
     # the agent must never be able to read them.
     documents = {section.section_id.split("#")[0] for section in knowledge_sections()}
     assert documents == {"process_overview", "fault_catalogue"}
