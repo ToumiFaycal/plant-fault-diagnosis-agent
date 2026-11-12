@@ -279,7 +279,7 @@ And for the whole report: a `fault` diagnosis needs at least one piece of eviden
 
 **The trial episodes,** chosen by a fixed rule so that we couldn't pick easy ones: development run 1 of the first fault of each grading group (fault 1 known, fault 3 hard, fault 16 unknown type), normal run 1, and the fault 5 episode of the first investigation. That covers all four grading groups and both triggers. They're listed in `config.toml` and run with `python -m plantagent.agent --trial`.
 
-**First trial** (in a rehearsal copy of the same code; the official run follows):
+**First trial** (first in a rehearsal copy of the same code, then Faycal's official run, which gave exactly the same results; see below):
 
 | Episode | The truth | Trigger | The agent's answer | Fact-check |
 |---|---|---|---|---|
@@ -304,5 +304,7 @@ And for the whole report: a `fault` diagnosis needs at least one piece of eviden
 - one run of one episode can't show whether a change helped.
 
 Faycal's own run of the same trial, from a freshly loaded model and in the same order, will tell us more: if it matches this one exactly, the answer depends on what ran before; if not, it's less predictable than that.
+
+**Faycal's run** (commit `0bdb30d`, traces in `results/traces/2026-11-12_160919/`) **matched the rehearsal exactly** in all 5 episodes: the same tool requests, the same reports, the same fact-checks; only the timings differed (60.6 to 130.2 s per episode). So the agent repeats itself when it starts from the same point (a freshly loaded model) and runs the same episodes in the same order. The fault 5 episode's answer depends on what ran before it in the same session. That supports the guess above, though the exact cause inside Ollama isn't confirmed. A consequence for the evaluation: repeating a run 3 times in the same order would give the same results 3 times and say nothing about the spread. How the repeats should differ (for example, a different episode order each time) will be decided in step 9.
 
 **Nothing else changed before that run,** so the two runs can be compared. Then the instructions may change, but only about *how* to investigate and report (for example: compare several contributors to normal; a single moment above a limit isn't an alarm; a fault that fits no catalogue entry is reported without a number). Never which signals go with which fault.
