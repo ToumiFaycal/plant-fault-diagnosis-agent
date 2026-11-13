@@ -91,8 +91,6 @@ def check_not_changed(path: Path, new_text: str) -> None:
     """
     if path.exists() and path.read_text(encoding="utf-8") != new_text:
         raise FrozenListError(f"{path.name} already exists and is different: nothing was written.")
-    # If the file doesn't exist or its text is the same as new_text, we can write it.
-    path.write_text(new_text, encoding="utf-8")
 
 
 def read_names(path: Path) -> set[str]:

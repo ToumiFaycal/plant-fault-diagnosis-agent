@@ -71,6 +71,15 @@ def test_a_saved_list_cannot_change(tmp_path):
     assert path.read_text(encoding="utf-8") == '{"episode": "ep_00000001"}\n'  # untouched
 
 
+def test_checking_a_list_never_writes_it(tmp_path):
+    # Checking and writing are two separate jobs. The builder checks BOTH lists first and writes
+    # only when both are fine; if checking also wrote, a failed check on the second list would
+    # leave the first one already written, while the error says "nothing was written".
+    path = tmp_path / "test.jsonl"
+    check_not_changed(path, '{"episode": "ep_00000001"}\n')
+    assert not path.exists()
+
+
 def test_test_runs_come_from_the_pool_and_never_from_development():
     splits = load_config()["splits"]
     pool = runs_between(splits["test_pool_runs"])
