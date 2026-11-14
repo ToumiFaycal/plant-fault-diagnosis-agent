@@ -363,3 +363,5 @@ and how to check it honestly. Like my
 [first project](https://github.com/ToumiFaycal/ai-inspection-assistant), I tried to make this one
 clear to anyone who reads it. If you have a question or want to talk, reach out on
 [LinkedIn](https://www.linkedin.com/in/faycal-toumi/): I'll gladly reply.
+
+This project is under the [MIT License](LICENSE).
