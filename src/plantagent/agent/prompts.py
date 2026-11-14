@@ -24,8 +24,25 @@ def fault_catalogue() -> str:
                        if section.section_id.startswith("fault_catalogue#"))
 
 
-def system_prompt() -> str:
+def how_to_read_the_monitor() -> str:
+    """Shared by the agent and the one-shot baseline B3, word for word."""
     in_a_row = load_config()["monitor"]["alarm_after_consecutive"]
+    return f"""How to read the monitor:
+- The monitor raises an alarm only after {in_a_row} moments in a row above a limit. In a get_monitor_status \
+result, first_alarm_time gives the alarm. If it is null, there was no alarm in that window, even if a score \
+went above its limit for a moment."""
+
+
+HOW_TO_CONCLUDE = """How to conclude:
+- no_fault: the monitor shows no alarm and no signal is far from normal.
+- fault with a fault_id: the evidence points to one fault of the catalogue below.
+- fault with fault_id null: the plant is clearly abnormal, but none of faults 1 to 15 fits.
+- inconclusive: something may be wrong, but the evidence does not allow a decision.
+- Use high confidence only when several pieces of evidence agree and one catalogue fault fits clearly better \
+than the others."""  # shared by the agent and B3, word for word
+
+
+def system_prompt() -> str:
     return f"""You investigate a problem report in a simulated chemical plant, the Tennessee Eastman process. \
 You can see the plant only through your tools, and you cannot change anything in it.
 
@@ -40,24 +57,43 @@ plant works and what each fault changes.
 - You may call several tools at each turn. When you have enough evidence, reply without calling any tool: \
 you will then be asked for your final report.
 
-How to read the monitor:
-- The monitor raises an alarm only after {in_a_row} moments in a row above a limit. In a get_monitor_status \
-result, first_alarm_time gives the alarm. If it is null, there was no alarm in that window, even if a score \
-went above its limit for a moment.
+{how_to_read_the_monitor()}
 
-How to conclude:
-- no_fault: the monitor shows no alarm and no signal is far from normal.
-- fault with a fault_id: the evidence points to one fault of the catalogue below.
-- fault with fault_id null: the plant is clearly abnormal, but none of faults 1 to 15 fits.
-- inconclusive: something may be wrong, but the evidence does not allow a decision.
-- Use high confidence only when several pieces of evidence agree and one catalogue fault fits clearly better \
-than the others.
+{HOW_TO_CONCLUDE}
 
 Rules:
 - Times are HH:MM counted from the start of the run. Nothing after "now" exists.
 - Never calculate numbers yourself: use the numbers in the tool results.
 - Every tool result has a call_id. Your report must cite them, and every citation is checked against the \
 result it names.
+
+The faults that can be switched on in this plant (the fault catalogue):
+
+{fault_catalogue()}"""
+
+
+def one_shot_prompt() -> str:
+    """The instructions of baseline B3: the same model, the same rules and catalogue, but no tools.
+    It gets the monitor's results once, and must conclude from them alone."""
+    return f"""You diagnose a problem report in a simulated chemical plant, the Tennessee Eastman process. \
+You cannot investigate: you are given, once, what the plant monitor saw over the last hour, and you must \
+conclude from that alone.
+
+What you are given:
+- A get_monitor_status result: the monitor's two scores against their limits, and the first moment in alarm.
+- Two top_contributors results, one for each score (T2 and SPE): the signals that carry most of it. A big \
+contributor is not always far from normal, and it shows where the strangeness appears, which is not always \
+where a problem started: controllers move valves to hold measurements steady.
+
+{how_to_read_the_monitor()}
+
+{HOW_TO_CONCLUDE}
+
+Rules:
+- Times are HH:MM counted from the start of the run. Nothing after "now" exists.
+- Never calculate numbers yourself: use the numbers in the results.
+- Every result has a call_id. Your report must cite them, and every citation is checked against the result \
+it names. Only the results you are given exist.
 
 The faults that can be switched on in this plant (the fault catalogue):
 

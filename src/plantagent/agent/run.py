@@ -24,8 +24,8 @@ from datetime import datetime
 
 from mcp import Client, StdioServerParameters
 
-from plantagent.agent.loop import Chat, investigate, ollama_chat
-from plantagent.agent.second_chance import report_with_second_chance
+from plantagent.agent.loop import Chat, Investigation, investigate, ollama_chat
+from plantagent.agent.second_chance import CheckedReport, report_with_second_chance
 from plantagent.agent.verifier import Verification
 from plantagent.config import PROJECT_ROOT, load_config
 from plantagent.results_log import git_commit
@@ -58,6 +58,8 @@ def show(event: dict) -> None:
     elif event["event"] == "tool":
         receipt = event["call_id"] or "ERROR"
         print(f"      {receipt}: {event['result'][:150]}")
+    elif event["event"] == "given":  # the one-shot baseline B3: results handed over, not asked for
+        print(f"given {event['call_id']} ({event['tool']}): {event['result'][:150]}")
     elif event["event"] == "report":
         which = "report" if event["attempt"] == 1 else "corrected report (second chance)"
         print(f"{which} written in {event['latency_s']} s ({event['prompt_tokens']} tokens read, "
@@ -68,6 +70,34 @@ def check_summary(check: Verification | None) -> dict | None:
     if check is None:
         return None
     return {"evidence_items": check.evidence_items, "failed_items": check.failed_items, "problems": check.problems}
+
+
+def save_episode(system: str, name: str, split: str, run_id: str, trigger_message: str,
+                 investigation: Investigation, checked: CheckedReport, seconds: float) -> dict:
+    """Write one episode's trace file (start, every event, end) and return its end summary.
+    Shared by the agent and the one-shot baseline B3, so the grader reads both the same way."""
+    config = load_config()
+    model_events = [e for e in investigation.trace if e["event"] in ("model", "report")]
+    summary = {
+        "event": "end", "system": system, "episode": name, "split": split, "run_id": run_id, "commit": git_commit(),
+        "seconds": seconds, "model_calls": investigation.model_calls, "tool_calls": investigation.tool_calls,
+        "stopped_by": investigation.stopped_by,
+        "largest_prompt_tokens": max(e["prompt_tokens"] or 0 for e in model_events),
+        "num_ctx": config["llm"]["num_ctx"],
+        "seconds_loading_model": round(sum(e["load_s"] for e in model_events), 1),
+        "outcome": checked.outcome,  # passed / fixed / verification_failed
+        "first_check": check_summary(checked.first_check),
+        "second_check": check_summary(checked.second_check),
+        "diagnosis": checked.report.model_dump() if checked.report else None,
+    }
+    trace_file = PROJECT_ROOT / config["agent"]["trace_dir"] / run_id / f"{name}.jsonl"
+    trace_file.parent.mkdir(parents=True, exist_ok=True)
+    start = {"event": "start", "system": system, "episode": name, "split": split, "trigger_message": trigger_message,
+             "llm": config["llm"], "max_steps": config["agent"]["max_steps"] if system == "agent" else None}
+    trace_file.write_text("".join(json.dumps(e, ensure_ascii=False) + "\n"
+                                  for e in [start, *investigation.trace, summary]), encoding="utf-8")
+    summary["trace_file"] = str(trace_file.relative_to(PROJECT_ROOT))
+    return summary
 
 
 async def run_episode(name: str, split: str, chat: Chat, run_id: str) -> dict:
@@ -82,28 +112,7 @@ async def run_episode(name: str, split: str, chat: Chat, run_id: str) -> dict:
         investigation = await investigate(client, chat, entry["trigger_message"], config["agent"]["max_steps"], show)
     checked = await report_with_second_chance(chat, investigation)
     seconds = round(time.perf_counter() - started, 1)
-
-    model_events = [e for e in investigation.trace if e["event"] in ("model", "report")]
-    summary = {
-        "event": "end", "episode": name, "split": split, "run_id": run_id, "commit": git_commit(),
-        "seconds": seconds, "model_calls": investigation.model_calls, "tool_calls": investigation.tool_calls,
-        "stopped_by": investigation.stopped_by,
-        "largest_prompt_tokens": max(e["prompt_tokens"] or 0 for e in model_events),
-        "num_ctx": config["llm"]["num_ctx"],
-        "seconds_loading_model": round(sum(e["load_s"] for e in model_events), 1),
-        "outcome": checked.outcome,  # passed / fixed / verification_failed
-        "first_check": check_summary(checked.first_check),
-        "second_check": check_summary(checked.second_check),
-        "diagnosis": checked.report.model_dump() if checked.report else None,
-    }
-    trace_file = PROJECT_ROOT / config["agent"]["trace_dir"] / run_id / f"{name}.jsonl"
-    trace_file.parent.mkdir(parents=True, exist_ok=True)
-    start = {"event": "start", "episode": name, "split": split, "trigger_message": entry["trigger_message"],
-             "llm": config["llm"], "max_steps": config["agent"]["max_steps"]}
-    trace_file.write_text("".join(json.dumps(e, ensure_ascii=False) + "\n"
-                                  for e in [start, *investigation.trace, summary]), encoding="utf-8")
-    summary["trace_file"] = str(trace_file.relative_to(PROJECT_ROOT))
-    return summary
+    return save_episode("agent", name, split, run_id, entry["trigger_message"], investigation, checked, seconds)
 
 
 def print_check(label: str, check: dict) -> None:
